@@ -5,32 +5,35 @@ const GRAPH = "https://graph.microsoft.com/v1.0";
 const EVENT_ID = "NHS-PROMPTATHON-001";
 
 async function getToken() {
-  const tenant = process.env.AZURE_TENANT_ID;
-  const client = process.env.AZURE_CLIENT_ID;
-  const secret = process.env.AZURE_CLIENT_SECRET;
+  const {
+    AZURE_TENANT_ID,
+    AZURE_CLIENT_ID,
+    AZURE_CLIENT_SECRET
+  } = process.env;
 
-  if (!tenant || !client || !secret) {
-    throw new Error("Missing Azure authentication settings");
+  if (!AZURE_TENANT_ID || !AZURE_CLIENT_ID ||
+      !AZURE_CLIENT_SECRET) {
+    throw new Error("Missing authentication settings");
   }
 
   const response = await fetch(
-    `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
+    `https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/token`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: new URLSearchParams({
-        client_id: client,
-        client_secret: secret,
-        grant_type: "client_credentials",
-        scope: "https://graph.microsoft.com/.default"
+        client_id: AZURE_CLIENT_ID,
+        client_secret: AZURE_CLIENT_SECRET,
+        scope: "https://graph.microsoft.com/.default",
+        grant_type: "client_credentials"
       })
     }
   );
 
   if (!response.ok) {
-    throw new Error(`Authentication failed (${response.status})`);
+    throw new Error(`Authentication failed: ${response.status}`);
   }
 
   return (await response.json()).access_token;
@@ -41,16 +44,18 @@ async function getAll(url, token) {
 
   while (url) {
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` }
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     if (!response.ok) {
-      throw new Error(`Graph request failed (${response.status})`);
+      throw new Error(`Graph request failed: ${response.status}`);
     }
 
-    const data = await response.json();
-    results.push(...(data.value ?? []));
-    url = data["@odata.nextLink"];
+    const page = await response.json();
+    results.push(...(page.value ?? []));
+    url = page["@odata.nextLink"] ?? null;
   }
 
   return results;
@@ -59,13 +64,11 @@ async function getAll(url, token) {
 app.http("status", {
   methods: ["GET"],
   authLevel: "anonymous",
+
   handler: async (request, context) => {
     try {
       const site = process.env.SHAREPOINT_SITE_ID;
-
-      if (!site) {
-        throw new Error("Missing SHAREPOINT_SITE_ID");
-      }
+      if (!site) throw new Error("Missing site ID");
 
       const token = await getToken();
 
@@ -74,34 +77,53 @@ app.http("status", {
         token
       );
 
-      const checkIns = lists.find(
-        list => list.displayName === "Count Me In - CheckIns"
+      const list = lists.find(
+        item => item.displayName === "Count Me In - CheckIns"
       );
 
-      if (!checkIns) {
+      if (!list) {
         throw new Error("CheckIns list not found");
       }
 
       const items = await getAll(
-        `${GRAPH}/sites/${site}/lists/${checkIns.id}/items?expand=fields`,
+        `${GRAPH}/sites/${site}/lists/${list.id}/items?expand=fields`,
         token
       );
 
-      // field_1 is the internal SharePoint name for EventID.
-      const count = items.filter(
-        item => item.fields?.field_1 === EVENT_ID
-      ).length;
+      const arrivals = items
+        .filter(item => item.fields?.field_1 === EVENT_ID)
+        .sort((a, b) =>
+          new Date(a.createdDateTime || 0) -
+          new Date(b.createdDateTime || 0)
+        );
+
+      const latest = arrivals.at(-1);
+
+      // Title is the standard SharePoint title field.
+      // Your Power Automate flow previously saved
+      // the submitted name into Title.
+      const latestName = String(
+        latest?.fields?.Title || ""
+      ).trim().slice(0, 60);
 
       return {
         status: 200,
         headers: {
-          "Cache-Control": "no-store"
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json"
         },
         jsonBody: {
           app: "Count Me In!",
           event: "NHS Promptathon",
           status: "ready",
-          count,
+          count: arrivals.length,
+          latestGuest: latest
+            ? {
+                id: latest.id,
+                name: latestName || "Guest",
+                number: arrivals.length
+              }
+            : null,
           updatedAt: new Date().toISOString()
         }
       };
@@ -112,10 +134,11 @@ app.http("status", {
         status: 500,
         jsonBody: {
           status: "error",
-          message: "Could not retrieve check-ins"
+          message: "Unable to retrieve check-ins"
         }
       };
     }
   }
 });
+
 
