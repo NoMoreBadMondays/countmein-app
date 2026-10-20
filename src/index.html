@@ -240,7 +240,6 @@
       color: var(--nhs);
       line-height: 1.1;
       margin: 12px 0;
-      cursor: pointer;
     }
 
     .counter-label {
@@ -259,7 +258,7 @@
     }
 
     .fill {
-      width: 53%;
+      width: 0;
       height: 100%;
       background: #00a499;
       border-radius: 20px;
@@ -341,14 +340,14 @@
 
         <div class="arrival" id="arrival" aria-live="polite">
           <div>
-            <div class="tag">✨ JUST CHECKED IN</div>
-            <h2 id="welcome">Welcome, Simon!</h2>
+            <div class="tag">✨ EVENT CHECK-IN</div>
+            <h2 id="welcome">Welcome, everyone!</h2>
             <p>You're officially part of the Promptathon.</p>
           </div>
 
           <div class="guest-badge">
-            <small>GUEST</small>
-            <strong id="guestNumber">#106</strong>
+            <small>CHECKED IN</small>
+            <strong id="guestNumber">—</strong>
           </div>
         </div>
       </section>
@@ -356,12 +355,13 @@
       <aside class="side">
         <section class="panel">
           <h3>Live event check-in</h3>
+
           <div class="muted">
             The Promptathon community is growing.
           </div>
 
           <div class="counter" id="count" aria-live="polite">
-            106
+            —
           </div>
 
           <div class="counter-label">
@@ -371,6 +371,10 @@
           <div class="bar">
             <div class="fill" id="fill"></div>
           </div>
+
+          <p class="muted" id="connectionStatus">
+            Connecting to live check-ins...
+          </p>
         </section>
       </aside>
     </main>
@@ -379,62 +383,133 @@
   <div class="toast" id="toast" role="status"></div>
 
   <script>
-    // Temporary demonstration data.
-    // Later this will connect to Microsoft Lists.
-
-    let count = 106;
-    let idx = 0;
-
-    const names = [
-      'Aisha', 'James', 'Priya', 'Oliver',
-      'Fatima', 'Daniel', 'Amelia',
-      'Mohammed', 'Grace', 'Alex',
-      'Sophie', 'Ravi'
-    ];
-
     const $ = id => document.getElementById(id);
 
-    function checkIn(name) {
-      name = String(name || 'Guest').trim().slice(0, 32);
-      if (!name) return;
+    const API_URL = '/api/status';
+    const REFRESH_INTERVAL = 5000;
+    const EVENT_CAPACITY = 200;
 
-      count++;
+    let lastCount = null;
+    let requestInProgress = false;
+    let toastTimer;
 
-      $('count').textContent = count;
-      $('guestNumber').textContent = '#' + count;
-      $('welcome').textContent = 'Welcome, ' + name + '!';
+    function updateProgress(count) {
+      const percentage = Math.min(
+        100,
+        (count / EVENT_CAPACITY) * 100
+      );
 
-      $('fill').style.width =
-        Math.min(100, count / 200 * 100) + '%';
+      $('fill').style.width = percentage + '%';
+    }
 
-      $('arrival').classList.remove('pop');
-      void $('arrival').offsetWidth;
-      $('arrival').classList.add('pop');
+    function animateArrival() {
+      const arrival = $('arrival');
 
-      $('toast').textContent =
-        '🎉 ' + name + ' is guest #' + count;
+      arrival.classList.remove('pop');
+      void arrival.offsetWidth;
+      arrival.classList.add('pop');
+    }
 
+    function showToast(message) {
+      $('toast').textContent = message;
       $('toast').classList.add('show');
 
-      clearTimeout(window.toastTimer);
-      window.toastTimer = setTimeout(() => {
+      clearTimeout(toastTimer);
+
+      toastTimer = setTimeout(() => {
         $('toast').classList.remove('show');
       }, 2700);
     }
 
-    // Press N to simulate a guest arriving.
-    function nextGuest() {
-      checkIn(names[idx++ % names.length]);
+    async function refreshCheckIns() {
+      if (requestInProgress) return;
+
+      requestInProgress = true;
+
+      try {
+        const response = await fetch(API_URL, {
+          cache: 'no-store'
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            'API returned ' + response.status
+          );
+        }
+
+        const data = await response.json();
+
+        if (
+          data.status !== 'ready' ||
+          !Number.isSafeInteger(data.count) ||
+          data.count < 0
+        ) {
+          throw new Error('Invalid check-in data');
+        }
+
+        const newCount = data.count;
+
+        $('count').textContent = newCount;
+        $('guestNumber').textContent = newCount;
+        updateProgress(newCount);
+
+        if (lastCount === null) {
+          $('welcome').textContent =
+            'Welcome, everyone!';
+        } else if (newCount > lastCount) {
+          const arrivals = newCount - lastCount;
+
+          $('welcome').textContent =
+            arrivals === 1
+              ? 'Another guest has arrived!'
+              : arrivals + ' more guests have arrived!';
+
+          animateArrival();
+
+          showToast(
+            arrivals === 1
+              ? '🎉 A new guest has checked in!'
+              : '🎉 ' + arrivals +
+                ' new guests have checked in!'
+          );
+        } else if (newCount < lastCount) {
+          $('welcome').textContent =
+            'Welcome, everyone!';
+        }
+
+        lastCount = newCount;
+
+        $('connectionStatus').textContent =
+          'Live • Automatically updates every 5 seconds';
+
+      } catch (error) {
+        console.error(
+          'Count Me In refresh failed:',
+          error
+        );
+
+        $('connectionStatus').textContent =
+          'Connection interrupted • Retrying...';
+
+        if (lastCount === null) {
+          $('count').textContent = '—';
+          $('guestNumber').textContent = '—';
+        }
+
+      } finally {
+        requestInProgress = false;
+      }
     }
 
-    document.addEventListener('keydown', e => {
-      if (e.key.toLowerCase() === 'n' && !e.repeat) {
-        nextGuest();
-      }
-    });
+    // Load real data immediately.
+    refreshCheckIns();
 
-    // Clicking the counter also simulates an arrival.
-    $('count').addEventListener('click', nextGuest);
+    // Keep checking for new arrivals.
+    setInterval(
+      refreshCheckIns,
+      REFRESH_INTERVAL
+    );
   </script>
 </body>
 </html>
+
