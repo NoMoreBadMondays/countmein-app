@@ -4,7 +4,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NHS Promptathon | Count Me In!</title>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+
+  <title>Count Me In! | NHS Promptathon</title>
 
   <style>
     :root {
@@ -13,7 +15,9 @@
       --ink: #17324d;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -91,18 +95,18 @@
     .main {
       flex: 1;
       display: grid;
-      grid-template-columns: minmax(0,1.55fr) minmax(300px,.8fr);
+      grid-template-columns: minmax(0, 1.55fr) minmax(300px, .8fr);
       gap: 30px;
       padding: 4vw 5vw;
       align-items: stretch;
     }
 
     .hero {
-      background: linear-gradient(145deg,#005eb8,#003087);
+      background: linear-gradient(145deg, #005eb8, #003087);
       border-radius: 22px;
       color: white;
       min-height: 530px;
-      padding: clamp(32px,5vw,70px);
+      padding: clamp(32px, 5vw, 70px);
       display: flex;
       flex-direction: column;
       position: relative;
@@ -110,7 +114,7 @@
       box-shadow: 0 20px 40px #00308725;
     }
 
-    .hero:after {
+    .hero::after {
       content: "";
       position: absolute;
       width: 440px;
@@ -130,7 +134,7 @@
     }
 
     .hero h1 {
-      font-size: clamp(48px,6vw,94px);
+      font-size: clamp(48px, 6vw, 94px);
       line-height: 1.03;
       letter-spacing: -3px;
       margin: 28px 0 12px;
@@ -141,7 +145,7 @@
     }
 
     .hero > p {
-      font-size: clamp(17px,1.7vw,24px);
+      font-size: clamp(17px, 1.7vw, 24px);
       line-height: 1.45;
       color: #e2f2ff;
       max-width: 640px;
@@ -163,13 +167,20 @@
 
     .arrival.pop {
       animation: pop .55s ease;
-      background: #ffffff30;
     }
 
     @keyframes pop {
-      0% { transform: scale(.96); }
-      55% { transform: scale(1.025); }
-      100% { transform: scale(1); }
+      0% {
+        transform: scale(.96);
+      }
+
+      55% {
+        transform: scale(1.025);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
 
     .tag {
@@ -180,8 +191,9 @@
     }
 
     .arrival h2 {
-      font-size: clamp(26px,3vw,45px);
+      font-size: clamp(26px, 3vw, 45px);
       margin: 9px 0 4px;
+      overflow-wrap: anywhere;
     }
 
     .arrival p {
@@ -238,7 +250,7 @@
     }
 
     .counter {
-      font-size: clamp(65px,7vw,110px);
+      font-size: clamp(65px, 7vw, 110px);
       font-weight: 800;
       letter-spacing: -5px;
       color: var(--nhs);
@@ -273,7 +285,7 @@
       position: fixed;
       bottom: 32px;
       left: 50%;
-      transform: translate(-50%,130px);
+      transform: translate(-50%, 130px);
       background: #003087;
       color: white;
       border-radius: 12px;
@@ -282,10 +294,12 @@
       font-weight: bold;
       transition: transform .4s;
       z-index: 5;
+      max-width: 90vw;
+      text-align: center;
     }
 
     .toast.show {
-      transform: translate(-50%,0);
+      transform: translate(-50%, 0);
     }
 
     @media (max-width: 900px) {
@@ -334,11 +348,13 @@
 
 <body>
   <div class="frame">
+
     <div class="top"></div>
 
     <header class="header">
       <div class="brand">
         <div class="nhs">NHS</div>
+
         <div>
           <small>INNOVATION • COLLABORATION • AI</small>
           <strong>Promptathon 2026</strong>
@@ -352,8 +368,11 @@
     </header>
 
     <main class="main">
+
       <section class="hero">
-        <div class="eyebrow">WELCOME TO THE EVENT</div>
+        <div class="eyebrow">
+          WELCOME TO THE EVENT
+        </div>
 
         <h1>
           Welcome to the<br>
@@ -367,20 +386,31 @@
         </p>
 
         <div class="arrival" id="arrival" aria-live="polite">
+
           <div>
-            <div class="tag">✨ JUST CHECKED IN</div>
-            <h2 id="welcome">Welcome, everyone!</h2>
-            <p>You're officially part of the Promptathon.</p>
+            <div class="tag">
+              ✨ JUST CHECKED IN
+            </div>
+
+            <h2 id="welcome">
+              Waiting for check-ins...
+            </h2>
+
+            <p>
+              Welcome to the NHS Promptathon.
+            </p>
           </div>
 
           <div class="guest-badge">
             <small>CHECKED IN</small>
             <strong id="guestNumber">—</strong>
           </div>
+
         </div>
       </section>
 
       <aside class="side">
+
         <section class="panel">
           <h3>Live event check-in</h3>
 
@@ -388,9 +418,11 @@
             The Promptathon community is growing.
           </div>
 
-          <div class="counter" id="count" aria-live="polite">
-            —
-          </div>
+          <div
+            class="counter"
+            id="count"
+            aria-live="polite"
+          >—</div>
 
           <div class="counter-label">
             PEOPLE CHECKED IN
@@ -404,71 +436,129 @@
             Connecting to live check-ins...
           </p>
         </section>
+
       </aside>
     </main>
+
   </div>
 
   <div class="toast" id="toast" role="status"></div>
 
   <script>
+    'use strict';
+
     const $ = id => document.getElementById(id);
 
+    // This is the same API you tested successfully.
     const API_URL = '/api/status';
+
+    // Check SharePoint every five seconds.
     const REFRESH_INTERVAL = 5000;
+
     const EVENT_CAPACITY = 200;
 
     let lastCount = null;
     let lastGuestId = null;
     let requestInProgress = false;
-    let toastTimer;
+    let toastTimer = null;
+
+    function getGuestName(data) {
+      // Read the name from the exact API structure:
+      // data.latestGuest.name
+
+      const name = data?.latestGuest?.name;
+
+      if (typeof name !== 'string') {
+        return '';
+      }
+
+      return name.trim();
+    }
+
+    function getGuestId(data) {
+      const id = data?.latestGuest?.id;
+
+      if (id === undefined || id === null) {
+        return null;
+      }
+
+      return String(id);
+    }
 
     function updateProgress(count) {
       const percentage = Math.min(
         100,
-        (count / EVENT_CAPACITY) * 100
+        Math.max(0, (count / EVENT_CAPACITY) * 100)
       );
 
       $('fill').style.width = percentage + '%';
+    }
+
+    function displayLatestGuest(name, count) {
+      if (count === 0) {
+        $('welcome').textContent =
+          'Waiting for check-ins...';
+        return;
+      }
+
+      if (name && name.toLowerCase() !== 'guest') {
+        $('welcome').textContent =
+          name + ' has checked in!';
+      } else {
+        $('welcome').textContent =
+          'A new guest has checked in!';
+      }
     }
 
     function animateArrival() {
       const arrival = $('arrival');
 
       arrival.classList.remove('pop');
+
+      // Restart the animation.
       void arrival.offsetWidth;
+
       arrival.classList.add('pop');
     }
 
     function showToast(message) {
-      $('toast').textContent = message;
-      $('toast').classList.add('show');
+      const toast = $('toast');
+
+      // Use textContent so guest names are never
+      // interpreted as HTML.
+      toast.textContent = message;
+      toast.classList.add('show');
 
       clearTimeout(toastTimer);
 
       toastTimer = setTimeout(() => {
-        $('toast').classList.remove('show');
-      }, 2700);
-    }
-
-    function getLatestName(data) {
-      return typeof data.latestGuest?.name === 'string'
-        ? data.latestGuest.name.trim()
-        : '';
+        toast.classList.remove('show');
+      }, 3000);
     }
 
     async function refreshCheckIns() {
-      if (requestInProgress) return;
+      if (requestInProgress) {
+        return;
+      }
 
       requestInProgress = true;
 
       try {
-        const response = await fetch(API_URL, {
-          cache: 'no-store'
+        // The timestamp prevents a cached API response.
+        const url =
+          API_URL + '?refresh=' + Date.now();
+
+        const response = await fetch(url, {
+          method: 'GET',
+          cache: 'no-store',
+          headers: {
+            'Accept': 'application/json'
+          }
         });
 
         if (!response.ok) {
           throw new Error(
-            'API returned ' + response.status
+            'API returned HTTP ' + response.status
           );
         }
 
@@ -479,63 +569,88 @@
           !Number.isSafeInteger(data.count) ||
           data.count < 0
         ) {
-          throw new Error('Invalid check-in data');
+          throw new Error(
+            'Unexpected API response'
+          );
         }
 
         const newCount = data.count;
-        const latestName = getLatestName(data);
-        const latestGuestId =
-          data.latestGuest?.id != null
-            ? String(data.latestGuest.id)
-            : null;
+        const guestName = getGuestName(data);
+        const guestId = getGuestId(data);
 
-        // Always update the real count.
-        $('count').textContent = newCount;
-        $('guestNumber').textContent = newCount;
+        // Update the count every time.
+        $('count').textContent =
+          String(newCount);
+
+        $('guestNumber').textContent =
+          String(newCount);
+
         updateProgress(newCount);
 
-        // Always display the latest guest's name,
-        // including when the page first loads.
-        $('welcome').textContent = latestName
-          ? 'Welcome, ' + latestName + '!'
-          : 'Welcome, everyone!';
+        // IMPORTANT:
+        // Always show the latest guest name.
+        // Do not wait for the count to change.
+        //
+        // For your confirmed API response:
+        // name = "Sarah"
+        // This displays:
+        // "Sarah has checked in!"
 
-        // Only animate genuinely new check-ins.
-        if (lastCount !== null && newCount > lastCount) {
-          const arrivals = newCount - lastCount;
+        displayLatestGuest(guestName, newCount);
 
+        // Detect a new arrival after initial load.
+        const isNewArrival =
+          lastCount !== null &&
+          (
+            newCount > lastCount ||
+            (
+              guestId !== null &&
+              lastGuestId !== null &&
+              guestId !== lastGuestId
+            )
+          );
+
+        if (isNewArrival) {
           animateArrival();
 
-          if (arrivals === 1 && latestName) {
-            showToast('🎉 Welcome, ' + latestName + '!');
-          } else if (arrivals === 1) {
-            showToast('🎉 A new guest has checked in!');
+          if (
+            guestName &&
+            guestName.toLowerCase() !== 'guest'
+          ) {
+            showToast(
+              '🎉 ' + guestName + ' has checked in!'
+            );
           } else {
             showToast(
-              '🎉 ' + arrivals +
-              ' new guests have checked in!'
+              '🎉 A new guest has checked in!'
             );
           }
         }
 
         lastCount = newCount;
-        lastGuestId = latestGuestId;
+        lastGuestId = guestId;
 
         $('connectionStatus').textContent =
           'Live • Automatically updates every 5 seconds';
 
       } catch (error) {
         console.error(
-          'Count Me In refresh failed:',
+          'Count Me In! API error:',
           error
         );
 
         $('connectionStatus').textContent =
           'Connection interrupted • Retrying...';
 
+        // Keep the last successful guest and count
+        // visible during a temporary connection issue.
+
         if (lastCount === null) {
           $('count').textContent = '—';
           $('guestNumber').textContent = '—';
+
+          $('welcome').textContent =
+            'Connecting to check-ins...';
         }
 
       } finally {
@@ -543,11 +658,14 @@
       }
     }
 
-    // Load the real guest count and latest name.
+    // Immediately fetch the latest name and count.
     refreshCheckIns();
 
-    // Refresh automatically every five seconds.
-    setInterval(refreshCheckIns, REFRESH_INTERVAL);
+    // Continue checking for new guests.
+    setInterval(
+      refreshCheckIns,
+      REFRESH_INTERVAL
+    );
   </script>
 </body>
 </html>
