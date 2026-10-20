@@ -4,68 +4,56 @@ import { app } from "@azure/functions";
 const GRAPH = "https://graph.microsoft.com/v1.0";
 const EVENT_ID = "NHS-PROMPTATHON-001";
 
-async function getAccessToken() {
-  const {
-    AZURE_TENANT_ID,
-    AZURE_CLIENT_ID,
-    AZURE_CLIENT_SECRET
-  } = process.env;
+async function getToken() {
+  const tenant = process.env.AZURE_TENANT_ID;
+  const client = process.env.AZURE_CLIENT_ID;
+  const secret = process.env.AZURE_CLIENT_SECRET;
+
+  if (!tenant || !client || !secret) {
+    throw new Error("Missing Azure authentication settings");
+  }
 
   const response = await fetch(
-    `https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/token`,
+    `https://login.microsoftonline.com/${tenant}/oauth2/v2.0/token`,
     {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded"
       },
       body: new URLSearchParams({
-        client_id: AZURE_CLIENT_ID,
-        client_secret: AZURE_CLIENT_SECRET,
-        scope: "https://graph.microsoft.com/.default",
-        grant_type: "client_credentials"
+        client_id: client,
+        client_secret: secret,
+        grant_type: "client_credentials",
+        scope: "https://graph.microsoft.com/.default"
       })
     }
   );
 
   if (!response.ok) {
-    throw new Error(`Authentication failed: ${response.status}`);
+    throw new Error(`Authentication failed (${response.status})`);
   }
 
-  const data = await response.json();
-  return data.access_token;
+  return (await response.json()).access_token;
 }
 
-async function graphGet(path, token) {
-  const response = await fetch(`${GRAPH}${path}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+async function getAll(url, token) {
+  const results = [];
 
-  if (!response.ok) {
-    throw new Error(`Microsoft Graph returned ${response.status}`);
-  }
-
-  return response.json();
-}
-
-async function graphGetAll(path, token) {
-  const items = [];
-  let next = `${GRAPH}${path}`;
-
-  while (next) {
-    const response = await fetch(next, {
+  while (url) {
+    const response = await fetch(url, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
     if (!response.ok) {
-      throw new Error(`Microsoft Graph returned ${response.status}`);
+      throw new Error(`Graph request failed (${response.status})`);
     }
 
-    const page = await response.json();
-    items.push(...(page.value ?? []));
-    next = page["@odata.nextLink"] ?? null;
+    const data = await response.json();
+    results.push(...(data.value ?? []));
+    url = data["@odata.nextLink"];
   }
 
-  return items;
+  return results;
 }
 
 app.http("status", {
@@ -73,57 +61,61 @@ app.http("status", {
   authLevel: "anonymous",
   handler: async (request, context) => {
     try {
-      const siteId = process.env.SHAREPOINT_SITE_ID;
-      const token = await getAccessToken();
+      const site = process.env.SHAREPOINT_SITE_ID;
 
-      // Find the CheckIns list by its display name.
-      const lists = await graphGetAll(
-        `/sites/${siteId}/lists`,
+      if (!site) {
+        throw new Error("Missing SHAREPOINT_SITE_ID");
+      }
+
+      const token = await getToken();
+
+      const lists = await getAll(
+        `${GRAPH}/sites/${site}/lists`,
         token
       );
 
-      const checkInsList = lists.find(
-        (list) => list.displayName === "Count Me In - CheckIns"
+      const checkIns = lists.find(
+        list => list.displayName === "Count Me In - CheckIns"
       );
 
-      if (!checkInsList) {
+      if (!checkIns) {
         throw new Error("CheckIns list not found");
       }
 
-      // Read all pages, including SharePoint column values.
-      const items = await graphGetAll(
-        `/sites/${siteId}/lists/${checkInsList.id}/items?expand=fields`,
+      const items = await getAll(
+        `${GRAPH}/sites/${site}/lists/${checkIns.id}/items?expand=fields`,
         token
       );
 
-      const arrivals = items.filter(
-        (item) => item.fields?.EventID === EVENT_ID
-      );
+      // field_1 is the internal SharePoint name for EventID.
+      const count = items.filter(
+        item => item.fields?.field_1 === EVENT_ID
+      ).length;
 
       return {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
           "Cache-Control": "no-store"
         },
         jsonBody: {
           app: "Count Me In!",
           event: "NHS Promptathon",
           status: "ready",
-          count: arrivals.length,
+          count,
           updatedAt: new Date().toISOString()
         }
       };
     } catch (error) {
-      context.error("Count Me In status error:", error.message);
+      context.error(error.message);
 
       return {
         status: 500,
         jsonBody: {
           status: "error",
-          message: "Unable to retrieve live check-ins"
+          message: "Could not retrieve check-ins"
         }
       };
     }
   }
 });
+
