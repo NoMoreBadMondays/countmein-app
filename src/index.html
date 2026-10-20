@@ -340,7 +340,7 @@
 
         <div class="arrival" id="arrival" aria-live="polite">
           <div>
-            <div class="tag">✨ EVENT CHECK-IN</div>
+            <div class="tag">✨ JUST CHECKED IN</div>
             <h2 id="welcome">Welcome, everyone!</h2>
             <p>You're officially part of the Promptathon.</p>
           </div>
@@ -454,25 +454,39 @@
         updateProgress(newCount);
 
         if (lastCount === null) {
+          // First load: show the current count without
+          // pretending a new arrival just happened.
           $('welcome').textContent =
             'Welcome, everyone!';
+
         } else if (newCount > lastCount) {
           const arrivals = newCount - lastCount;
 
+          const latestName =
+            typeof data.latestGuest?.name === 'string'
+              ? data.latestGuest.name.trim()
+              : '';
+
           $('welcome').textContent =
-            arrivals === 1
-              ? 'Another guest has arrived!'
-              : arrivals + ' more guests have arrived!';
+            arrivals === 1 && latestName
+              ? 'Welcome, ' + latestName + '!'
+              : arrivals === 1
+                ? 'Another guest has arrived!'
+                : arrivals + ' more guests have arrived!';
 
           animateArrival();
 
           showToast(
-            arrivals === 1
-              ? '🎉 A new guest has checked in!'
-              : '🎉 ' + arrivals +
-                ' new guests have checked in!'
+            arrivals === 1 && latestName
+              ? '🎉 Welcome, ' + latestName + '!'
+              : arrivals === 1
+                ? '🎉 A new guest has checked in!'
+                : '🎉 ' + arrivals +
+                  ' new guests have checked in!'
           );
+
         } else if (newCount < lastCount) {
+          // Handle a corrected or removed check-in.
           $('welcome').textContent =
             'Welcome, everyone!';
         }
@@ -501,10 +515,10 @@
       }
     }
 
-    // Load real data immediately.
+    // Load the current count immediately.
     refreshCheckIns();
 
-    // Keep checking for new arrivals.
+    // Automatically check for new arrivals.
     setInterval(
       refreshCheckIns,
       REFRESH_INTERVAL
@@ -512,4 +526,5 @@
   </script>
 </body>
 </html>
+
 
