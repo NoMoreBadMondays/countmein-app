@@ -65,7 +65,9 @@
       font-weight: 700;
     }
 
-    .header strong { font-size: 20px; }
+    .header strong {
+      font-size: 20px;
+    }
 
     .pill {
       border-radius: 50px;
@@ -134,7 +136,9 @@
       margin: 28px 0 12px;
     }
 
-    .hero h1 span { color: #8fe1f9; }
+    .hero h1 span {
+      color: #8fe1f9;
+    }
 
     .hero > p {
       font-size: clamp(17px,1.7vw,24px);
@@ -285,21 +289,45 @@
     }
 
     @media (max-width: 900px) {
-      .main { grid-template-columns: 1fr; }
-      .hero { min-height: 520px; }
-      .header strong { font-size: 16px; }
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 520px;
+      }
+
+      .header strong {
+        font-size: 16px;
+      }
     }
 
     @media (max-width: 600px) {
-      .header { padding: 18px; }
-      .header small { font-size: 10px; }
-      .nhs { font-size: 31px; }
-      .pill { font-size: 10px; padding: 8px; }
+      .header {
+        padding: 18px;
+      }
+
+      .header small {
+        font-size: 10px;
+      }
+
+      .nhs {
+        font-size: 31px;
+      }
+
+      .pill {
+        font-size: 10px;
+        padding: 8px;
+      }
+
       .arrival {
         flex-direction: column;
         align-items: stretch;
       }
-      .guest-badge { align-self: flex-start; }
+
+      .guest-badge {
+        align-self: flex-start;
+      }
     }
   </style>
 </head>
@@ -390,6 +418,7 @@
     const EVENT_CAPACITY = 200;
 
     let lastCount = null;
+    let lastGuestId = null;
     let requestInProgress = false;
     let toastTimer;
 
@@ -421,6 +450,12 @@
       }, 2700);
     }
 
+    function getLatestName(data) {
+      return typeof data.latestGuest?.name === 'string'
+        ? data.latestGuest.name.trim()
+        : '';
+    }
+
     async function refreshCheckIns() {
       if (requestInProgress) return;
 
@@ -448,50 +483,43 @@
         }
 
         const newCount = data.count;
+        const latestName = getLatestName(data);
+        const latestGuestId =
+          data.latestGuest?.id != null
+            ? String(data.latestGuest.id)
+            : null;
 
+        // Always update the real count.
         $('count').textContent = newCount;
         $('guestNumber').textContent = newCount;
         updateProgress(newCount);
 
-        if (lastCount === null) {
-          // First load: show the current count without
-          // pretending a new arrival just happened.
-          $('welcome').textContent =
-            'Welcome, everyone!';
+        // Always display the latest guest's name,
+        // including when the page first loads.
+        $('welcome').textContent = latestName
+          ? 'Welcome, ' + latestName + '!'
+          : 'Welcome, everyone!';
 
-        } else if (newCount > lastCount) {
+        // Only animate genuinely new check-ins.
+        if (lastCount !== null && newCount > lastCount) {
           const arrivals = newCount - lastCount;
-
-          const latestName =
-            typeof data.latestGuest?.name === 'string'
-              ? data.latestGuest.name.trim()
-              : '';
-
-          $('welcome').textContent =
-            arrivals === 1 && latestName
-              ? 'Welcome, ' + latestName + '!'
-              : arrivals === 1
-                ? 'Another guest has arrived!'
-                : arrivals + ' more guests have arrived!';
 
           animateArrival();
 
-          showToast(
-            arrivals === 1 && latestName
-              ? '🎉 Welcome, ' + latestName + '!'
-              : arrivals === 1
-                ? '🎉 A new guest has checked in!'
-                : '🎉 ' + arrivals +
-                  ' new guests have checked in!'
-          );
-
-        } else if (newCount < lastCount) {
-          // Handle a corrected or removed check-in.
-          $('welcome').textContent =
-            'Welcome, everyone!';
+          if (arrivals === 1 && latestName) {
+            showToast('🎉 Welcome, ' + latestName + '!');
+          } else if (arrivals === 1) {
+            showToast('🎉 A new guest has checked in!');
+          } else {
+            showToast(
+              '🎉 ' + arrivals +
+              ' new guests have checked in!'
+            );
+          }
         }
 
         lastCount = newCount;
+        lastGuestId = latestGuestId;
 
         $('connectionStatus').textContent =
           'Live • Automatically updates every 5 seconds';
@@ -515,14 +543,11 @@
       }
     }
 
-    // Load the current count immediately.
+    // Load the real guest count and latest name.
     refreshCheckIns();
 
-    // Automatically check for new arrivals.
-    setInterval(
-      refreshCheckIns,
-      REFRESH_INTERVAL
-    );
+    // Refresh automatically every five seconds.
+    setInterval(refreshCheckIns, REFRESH_INTERVAL);
   </script>
 </body>
 </html>
