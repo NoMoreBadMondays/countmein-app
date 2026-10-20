@@ -386,9 +386,8 @@
         </p>
 
         <div class="arrival" id="arrival" aria-live="polite">
-
           <div>
-            <div class="tag">
+            <div class="tag" id="arrivalTag">
               ✨ JUST CHECKED IN
             </div>
 
@@ -396,7 +395,7 @@
               Waiting for check-ins...
             </h2>
 
-            <p>
+            <p id="arrivalSubtitle">
               Welcome to the NHS Promptathon.
             </p>
           </div>
@@ -405,12 +404,10 @@
             <small>CHECKED IN</small>
             <strong id="guestNumber">—</strong>
           </div>
-
         </div>
       </section>
 
       <aside class="side">
-
         <section class="panel">
           <h3>Live event check-in</h3>
 
@@ -436,10 +433,9 @@
             Connecting to live check-ins...
           </p>
         </section>
-
       </aside>
-    </main>
 
+    </main>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
@@ -449,40 +445,67 @@
 
     const $ = id => document.getElementById(id);
 
-    // This is the same API you tested successfully.
+    // Your existing, working Azure API.
     const API_URL = '/api/status';
 
-    // Check SharePoint every five seconds.
+    // Continue polling every five seconds.
     const REFRESH_INTERVAL = 5000;
+
+    // Show a fun message every 50 seconds.
+    const MESSAGE_INTERVAL = 50000;
 
     const EVENT_CAPACITY = 200;
 
+    // Four messages, repeating in order.
+    const FUN_MESSAGES = [
+      {
+        tag: '👀 THE WAITING GAME',
+        message: "Any guesses who's coming next?",
+        subtitle: 'Place your predictions now!'
+      },
+      {
+        tag: '⏰ FASHIONABLY LATE?',
+        message: "Who's planning a dramatic entrance?",
+        subtitle: 'We promise to give them a round of applause!'
+      },
+      {
+        tag: '☕ IMPORTANT QUESTION',
+        message: 'We hope the latecomers are bringing biscuits!',
+        subtitle: 'Chocolate digestives get extra points.'
+      },
+      {
+        tag: '🎤 THE GRAND ENTRANCE',
+        message: 'Is anyone rehearsing their entrance music?',
+        subtitle: 'The stage is yours!'
+      }
+    ];
+
     let lastCount = null;
     let lastGuestId = null;
+
+    // Time of the latest arrival detected by this page.
+    let lastArrivalTime = Date.now();
+
+    // Index of the last displayed fun message.
+    let currentFunMessage = -1;
+
     let requestInProgress = false;
     let toastTimer = null;
 
     function getGuestName(data) {
-      // Read the name from the exact API structure:
-      // data.latestGuest.name
-
       const name = data?.latestGuest?.name;
 
-      if (typeof name !== 'string') {
-        return '';
-      }
-
-      return name.trim();
+      return typeof name === 'string'
+        ? name.trim()
+        : '';
     }
 
     function getGuestId(data) {
       const id = data?.latestGuest?.id;
 
-      if (id === undefined || id === null) {
-        return null;
-      }
-
-      return String(id);
+      return id === undefined || id === null
+        ? null
+        : String(id);
     }
 
     function updateProgress(count) {
@@ -494,10 +517,41 @@
       $('fill').style.width = percentage + '%';
     }
 
-    function displayLatestGuest(name, count) {
+    function animateArrival() {
+      const arrival = $('arrival');
+
+      arrival.classList.remove('pop');
+
+      // Restart animation.
+      void arrival.offsetWidth;
+
+      arrival.classList.add('pop');
+    }
+
+    function showToast(message) {
+      const toast = $('toast');
+
+      toast.textContent = message;
+      toast.classList.add('show');
+
+      clearTimeout(toastTimer);
+
+      toastTimer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function showGuestArrival(name, count) {
+      $('arrivalTag').textContent =
+        '✨ JUST CHECKED IN';
+
+      $('arrivalSubtitle').textContent =
+        'Welcome to the NHS Promptathon.';
+
       if (count === 0) {
         $('welcome').textContent =
           'Waiting for check-ins...';
+
         return;
       }
 
@@ -510,30 +564,47 @@
       }
     }
 
-    function animateArrival() {
-      const arrival = $('arrival');
+    function showFunMessage(index) {
+      const item =
+        FUN_MESSAGES[index % FUN_MESSAGES.length];
 
-      arrival.classList.remove('pop');
+      $('arrivalTag').textContent = item.tag;
 
-      // Restart the animation.
-      void arrival.offsetWidth;
+      $('welcome').textContent = item.message;
 
-      arrival.classList.add('pop');
+      $('arrivalSubtitle').textContent =
+        item.subtitle;
+
+      animateArrival();
     }
 
-    function showToast(message) {
-      const toast = $('toast');
+    function updateWaitingMessage() {
+      // Wait until the first successful API response.
+      if (lastCount === null) {
+        return;
+      }
 
-      // Use textContent so guest names are never
-      // interpreted as HTML.
-      toast.textContent = message;
-      toast.classList.add('show');
+      const elapsed =
+        Date.now() - lastArrivalTime;
 
-      clearTimeout(toastTimer);
+      // Keep the arrival message visible for 50 seconds.
+      if (elapsed < MESSAGE_INTERVAL) {
+        return;
+      }
 
-      toastTimer = setTimeout(() => {
-        toast.classList.remove('show');
-      }, 3000);
+      // At 50s => 0
+      // At 100s => 1
+      // At 150s => 2
+      // At 200s => 3
+      // At 250s => 4 (repeats first message)
+      const messageIndex =
+        Math.floor(elapsed / MESSAGE_INTERVAL) - 1;
+
+      if (messageIndex !== currentFunMessage) {
+        currentFunMessage = messageIndex;
+
+        showFunMessage(messageIndex);
+      }
     }
 
     async function refreshCheckIns() {
@@ -544,7 +615,7 @@
       requestInProgress = true;
 
       try {
-        // The timestamp prevents a cached API response.
+        // Prevent the browser caching the API response.
         const url =
           API_URL + '?refresh=' + Date.now();
 
@@ -578,52 +649,57 @@
         const guestName = getGuestName(data);
         const guestId = getGuestId(data);
 
-        // Update the count every time.
-        $('count').textContent =
-          String(newCount);
+        // Keep the live counters working.
+        $('count').textContent = String(newCount);
 
-        $('guestNumber').textContent =
-          String(newCount);
+        $('guestNumber').textContent = String(newCount);
 
         updateProgress(newCount);
 
-        // IMPORTANT:
-        // Always show the latest guest name.
-        // Do not wait for the count to change.
-        //
-        // For your confirmed API response:
-        // name = "Sarah"
-        // This displays:
-        // "Sarah has checked in!"
+        // First load: show the latest guest immediately.
+        if (lastCount === null) {
+          lastArrivalTime = Date.now();
+          currentFunMessage = -1;
 
-        displayLatestGuest(guestName, newCount);
-
-        // Detect a new arrival after initial load.
-        const isNewArrival =
-          lastCount !== null &&
-          (
+          showGuestArrival(guestName, newCount);
+        } else {
+          // Detect a genuinely new check-in.
+          const isNewArrival =
             newCount > lastCount ||
             (
               guestId !== null &&
               lastGuestId !== null &&
               guestId !== lastGuestId
-            )
-          );
-
-        if (isNewArrival) {
-          animateArrival();
-
-          if (
-            guestName &&
-            guestName.toLowerCase() !== 'guest'
-          ) {
-            showToast(
-              '🎉 ' + guestName + ' has checked in!'
             );
-          } else {
-            showToast(
-              '🎉 A new guest has checked in!'
-            );
+
+          if (isNewArrival) {
+            // Reset the fun-message countdown.
+            lastArrivalTime = Date.now();
+            currentFunMessage = -1;
+
+            // A new arrival always takes priority.
+            showGuestArrival(guestName, newCount);
+
+            animateArrival();
+
+            if (
+              guestName &&
+              guestName.toLowerCase() !== 'guest'
+            ) {
+              showToast(
+                '🎉 ' + guestName + ' has checked in!'
+              );
+            } else {
+              showToast(
+                '🎉 A new guest has checked in!'
+              );
+            }
+          } else if (newCount < lastCount) {
+            // Handle a check-in list being reset.
+            lastArrivalTime = Date.now();
+            currentFunMessage = -1;
+
+            showGuestArrival(guestName, newCount);
           }
         }
 
@@ -642,9 +718,6 @@
         $('connectionStatus').textContent =
           'Connection interrupted • Retrying...';
 
-        // Keep the last successful guest and count
-        // visible during a temporary connection issue.
-
         if (lastCount === null) {
           $('count').textContent = '—';
           $('guestNumber').textContent = '—';
@@ -658,16 +731,23 @@
       }
     }
 
-    // Immediately fetch the latest name and count.
+    // Fetch the latest check-in immediately.
     refreshCheckIns();
 
-    // Continue checking for new guests.
+    // Check for new arrivals every five seconds.
     setInterval(
       refreshCheckIns,
       REFRESH_INTERVAL
     );
+
+    // Check the waiting timer every second.
+    setInterval(
+      updateWaitingMessage,
+      1000
+    );
   </script>
 </body>
 </html>
+
 
 
