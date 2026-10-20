@@ -1,17 +1,440 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="styles.css">
-  <title>Vanilla JavaScript App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NHS Promptathon | Count Me In!</title>
+
+  <style>
+    :root {
+      --nhs: #005eb8;
+      --deep: #003087;
+      --ink: #17324d;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #edf3f8;
+      color: var(--ink);
+    }
+
+    .frame {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top {
+      height: 12px;
+      background: var(--nhs);
+    }
+
+    .header {
+      background: white;
+      padding: 22px 5vw;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid #d5e1ea;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nhs {
+      font: bold italic 40px Arial;
+      color: white;
+      background: var(--nhs);
+      padding: 1px 16px 3px;
+      letter-spacing: -3px;
+    }
+
+    .header small {
+      display: block;
+      color: #52718a;
+      font-size: 13px;
+      letter-spacing: 1.4px;
+      font-weight: 700;
+    }
+
+    .header strong { font-size: 20px; }
+
+    .pill {
+      border-radius: 50px;
+      background: #e8f6ef;
+      color: #087347;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+
+    .dot {
+      display: inline-block;
+      background: #16a36a;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 7px;
+    }
+
+    .main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: minmax(0,1.55fr) minmax(300px,.8fr);
+      gap: 30px;
+      padding: 4vw 5vw;
+      align-items: stretch;
+    }
+
+    .hero {
+      background: linear-gradient(145deg,#005eb8,#003087);
+      border-radius: 22px;
+      color: white;
+      min-height: 530px;
+      padding: clamp(32px,5vw,70px);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 40px #00308725;
+    }
+
+    .hero:after {
+      content: "";
+      position: absolute;
+      width: 440px;
+      height: 440px;
+      border: 65px solid #ffffff0d;
+      border-radius: 50%;
+      right: -190px;
+      top: -160px;
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      font-size: 14px;
+      letter-spacing: 3px;
+      font-weight: bold;
+      color: #b9e3ff;
+    }
+
+    .hero h1 {
+      font-size: clamp(48px,6vw,94px);
+      line-height: 1.03;
+      letter-spacing: -3px;
+      margin: 28px 0 12px;
+    }
+
+    .hero h1 span { color: #8fe1f9; }
+
+    .hero > p {
+      font-size: clamp(17px,1.7vw,24px);
+      line-height: 1.45;
+      color: #e2f2ff;
+      max-width: 640px;
+    }
+
+    .arrival {
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+      background: #ffffff18;
+      border: 1px solid #ffffff3a;
+      border-radius: 18px;
+      padding: 25px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .arrival.pop {
+      animation: pop .55s ease;
+      background: #ffffff30;
+    }
+
+    @keyframes pop {
+      0% { transform: scale(.96); }
+      55% { transform: scale(1.025); }
+      100% { transform: scale(1); }
+    }
+
+    .tag {
+      font-size: 12px;
+      letter-spacing: 2px;
+      color: #bde9ff;
+      font-weight: bold;
+    }
+
+    .arrival h2 {
+      font-size: clamp(26px,3vw,45px);
+      margin: 9px 0 4px;
+    }
+
+    .arrival p {
+      margin: 0;
+      font-size: 16px;
+      color: #e2f2ff;
+    }
+
+    .guest-badge {
+      border-radius: 15px;
+      background: white;
+      color: var(--deep);
+      padding: 18px 23px;
+      text-align: center;
+      min-width: 135px;
+    }
+
+    .guest-badge small {
+      display: block;
+      font-size: 12px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .guest-badge strong {
+      font-size: 48px;
+      line-height: 1.15;
+    }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      align-self: start;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 20px;
+      padding: 29px;
+      box-shadow: 0 10px 30px #00308710;
+    }
+
+    .panel h3 {
+      margin: 0 0 9px;
+      font-size: 22px;
+      color: var(--deep);
+    }
+
+    .muted {
+      color: #55738c;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .counter {
+      font-size: clamp(65px,7vw,110px);
+      font-weight: 800;
+      letter-spacing: -5px;
+      color: var(--nhs);
+      line-height: 1.1;
+      margin: 12px 0;
+      cursor: pointer;
+    }
+
+    .counter-label {
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #54728c;
+    }
+
+    .bar {
+      height: 9px;
+      background: #e8f2fb;
+      border-radius: 20px;
+      margin-top: 22px;
+      overflow: hidden;
+    }
+
+    .fill {
+      width: 53%;
+      height: 100%;
+      background: #00a499;
+      border-radius: 20px;
+      transition: width .5s;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translate(-50%,130px);
+      background: #003087;
+      color: white;
+      border-radius: 12px;
+      padding: 14px 25px;
+      box-shadow: 0 15px 40px #001f4470;
+      font-weight: bold;
+      transition: transform .4s;
+      z-index: 5;
+    }
+
+    .toast.show {
+      transform: translate(-50%,0);
+    }
+
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; }
+      .hero { min-height: 520px; }
+      .header strong { font-size: 16px; }
+    }
+
+    @media (max-width: 600px) {
+      .header { padding: 18px; }
+      .header small { font-size: 10px; }
+      .nhs { font-size: 31px; }
+      .pill { font-size: 10px; padding: 8px; }
+      .arrival {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .guest-badge { align-self: flex-start; }
+    }
+  </style>
 </head>
 
 <body>
-  <main>
-    <h1>Vanilla JavaScript App</h1>
-  </main>
-</body>
+  <div class="frame">
+    <div class="top"></div>
 
+    <header class="header">
+      <div class="brand">
+        <div class="nhs">NHS</div>
+        <div>
+          <small>INNOVATION • COLLABORATION • AI</small>
+          <strong>Promptathon 2026</strong>
+        </div>
+      </div>
+
+      <div class="pill">
+        <span class="dot"></span>
+        EVENT CHECK-IN LIVE
+      </div>
+    </header>
+
+    <main class="main">
+      <section class="hero">
+        <div class="eyebrow">WELCOME TO THE EVENT</div>
+
+        <h1>
+          Welcome to the<br>
+          <span>Promptathon.</span>
+        </h1>
+
+        <p>
+          Big ideas start with people. Today, we explore
+          what's possible when creativity, collaboration
+          and AI come together.
+        </p>
+
+        <div class="arrival" id="arrival" aria-live="polite">
+          <div>
+            <div class="tag">✨ JUST CHECKED IN</div>
+            <h2 id="welcome">Welcome, Simon!</h2>
+            <p>You're officially part of the Promptathon.</p>
+          </div>
+
+          <div class="guest-badge">
+            <small>GUEST</small>
+            <strong id="guestNumber">#106</strong>
+          </div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="panel">
+          <h3>Live event check-in</h3>
+          <div class="muted">
+            The Promptathon community is growing.
+          </div>
+
+          <div class="counter" id="count" aria-live="polite">
+            106
+          </div>
+
+          <div class="counter-label">
+            PEOPLE CHECKED IN
+          </div>
+
+          <div class="bar">
+            <div class="fill" id="fill"></div>
+          </div>
+        </section>
+      </aside>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    // Temporary demonstration data.
+    // Later this will connect to Microsoft Lists.
+
+    let count = 106;
+    let idx = 0;
+
+    const names = [
+      'Aisha', 'James', 'Priya', 'Oliver',
+      'Fatima', 'Daniel', 'Amelia',
+      'Mohammed', 'Grace', 'Alex',
+      'Sophie', 'Ravi'
+    ];
+
+    const $ = id => document.getElementById(id);
+
+    function checkIn(name) {
+      name = String(name || 'Guest').trim().slice(0, 32);
+      if (!name) return;
+
+      count++;
+
+      $('count').textContent = count;
+      $('guestNumber').textContent = '#' + count;
+      $('welcome').textContent = 'Welcome, ' + name + '!';
+
+      $('fill').style.width =
+        Math.min(100, count / 200 * 100) + '%';
+
+      $('arrival').classList.remove('pop');
+      void $('arrival').offsetWidth;
+      $('arrival').classList.add('pop');
+
+      $('toast').textContent =
+        '🎉 ' + name + ' is guest #' + count;
+
+      $('toast').classList.add('show');
+
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => {
+        $('toast').classList.remove('show');
+      }, 2700);
+    }
+
+    // Press N to simulate a guest arriving.
+    function nextGuest() {
+      checkIn(names[idx++ % names.length]);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key.toLowerCase() === 'n' && !e.repeat) {
+        nextGuest();
+      }
+    });
+
+    // Clicking the counter also simulates an arrival.
+    $('count').addEventListener('click', nextGuest);
+  </script>
+</body>
 </html>
