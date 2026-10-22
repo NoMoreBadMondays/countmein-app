@@ -8,16 +8,17 @@
 
 <style>
 :root {
-  --page-bg: #edf3f8;
-  --hero-bg: #005eb8;
+  /* Modern orange / black / grey default theme */
+  --page-bg: #f7f7f8;
+  --hero-bg: #ff6b00;
   --circle-color: #ffffff;
   --hero-text: #ffffff;
-  --hero-muted: #e2f2ff;
-  --blue-text: #005eb8;
-  --grey-text: #55738c;
+  --hero-muted: #ffffff;
+  --blue-text: #101016;
+  --grey-text: #68686d;
   --badge-bg: #ffffff;
-  --badge-text: #003087;
-  --progress-color: #00a499;
+  --badge-text: #101016;
+  --progress-color: #ff6b00;
   --card-bg: #ffffff;
   --arrival-bg: #ffffff18;
   --arrival-border: #ffffff3a;
@@ -66,7 +67,7 @@ textarea {
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 20px 40px #00308725;
+  box-shadow: 0 20px 40px #10101618;
 }
 
 .hero::after {
@@ -87,7 +88,7 @@ textarea {
   letter-spacing: 3px;
   font-weight: bold;
   color: var(--hero-text);
-  opacity: .8;
+  opacity: .85;
   position: relative;
   z-index: 1;
 }
@@ -190,7 +191,7 @@ textarea {
   background: var(--card-bg);
   border-radius: 20px;
   padding: 29px;
-  box-shadow: 0 10px 30px #00308710;
+  box-shadow: 0 10px 30px #10101610;
 }
 
 .panel h3 {
@@ -223,7 +224,7 @@ textarea {
 
 .bar {
   height: 9px;
-  background: #e8f2fb;
+  background: #eeeeef;
   border-radius: 20px;
   margin-top: 22px;
   overflow: hidden;
@@ -246,7 +247,7 @@ textarea {
   color: white;
   border-radius: 12px;
   padding: 14px 25px;
-  box-shadow: 0 15px 40px #001f4470;
+  box-shadow: 0 15px 40px #10101655;
   font-weight: bold;
   transition: transform .4s;
   z-index: 5;
@@ -269,18 +270,18 @@ textarea {
   height: 48px;
   display: grid;
   place-items: center;
-  border: 1px solid #d1deeb;
+  border: 1px solid #dedee2;
   border-radius: 50%;
   background: white;
   color: var(--blue-text);
-  box-shadow: 0 6px 24px #00308730;
+  box-shadow: 0 6px 24px #10101625;
   cursor: pointer;
 }
 
 .settings-button:hover,
 .settings-button:focus-visible {
-  background: #e8f2fb;
-  outline: 2px solid var(--blue-text);
+  background: #f3f3f4;
+  outline: 2px solid var(--progress-color);
   outline-offset: 2px;
 }
 
@@ -294,7 +295,7 @@ textarea {
 .settings-backdrop {
   position: fixed;
   inset: 0;
-  background: #001b37a6;
+  background: #101016a6;
   z-index: 10;
   display: flex;
   justify-content: center;
@@ -308,13 +309,13 @@ textarea {
 
 .settings-dialog {
   background: white;
-  color: #17324d;
+  color: #101016;
   width: min(570px, 100%);
   max-height: calc(100vh - 36px);
   overflow-y: auto;
   border-radius: 20px;
   padding: 26px;
-  box-shadow: 0 22px 60px #001b3770;
+  box-shadow: 0 22px 60px #10101650;
 }
 
 .settings-head {
@@ -326,13 +327,13 @@ textarea {
 
 .settings-head h2 {
   margin: 0;
-  color: #003087;
+  color: #101016;
   font-size: 25px;
 }
 
 .close-button {
   border: 0;
-  background: #edf3f8;
+  background: #f0f0f1;
   border-radius: 10px;
   width: 36px;
   height: 36px;
@@ -342,16 +343,16 @@ textarea {
 
 .settings-note {
   font-size: 14px;
-  color: #526d84;
+  color: #68686d;
   line-height: 1.5;
 }
 
 .settings-section-title {
   font-size: 16px;
-  color: #003087;
+  color: #101016;
   margin: 26px 0 10px;
   padding-bottom: 8px;
-  border-bottom: 1px solid #dbe5ee;
+  border-bottom: 1px solid #e3e3e5;
 }
 
 .field {
@@ -368,7 +369,7 @@ textarea {
 
 .field textarea {
   width: 100%;
-  border: 1px solid #aebfd0;
+  border: 1px solid #bdbdc3;
   border-radius: 10px;
   padding: 12px;
   resize: vertical;
@@ -377,7 +378,7 @@ textarea {
 
 .field textarea:focus-visible,
 .color-input:focus-visible {
-  outline: 2px solid #005eb8;
+  outline: 2px solid #ff6b00;
   outline-offset: 2px;
 }
 
@@ -392,9 +393,9 @@ textarea {
   width: 100%;
   height: 48px;
   padding: 4px;
-  border: 1px solid #aebfd0;
+  border: 1px solid #bdbdc3;
   border-radius: 10px;
-  background: #fff;
+  background: white;
   cursor: pointer;
 }
 
@@ -414,13 +415,13 @@ textarea {
 }
 
 .apply {
-  background: #005eb8;
-  color: white;
+  background: #ff6b00;
+  color: #101016;
 }
 
 .reset {
-  background: #e9f0f7;
-  color: #003087;
+  background: #f0f0f1;
+  color: #101016;
 }
 
 @media (max-width: 900px) {
@@ -465,6 +466,7 @@ textarea {
 
 <div class="frame">
 
+  <!-- Settings cog -->
   <button
     class="settings-button"
     id="settingsOpen"
@@ -564,6 +566,7 @@ textarea {
 
 <div class="toast" id="toast" role="status"></div>
 
+<!-- Settings window -->
 <div
   class="settings-backdrop"
   id="settingsBackdrop"
@@ -750,15 +753,15 @@ const DEFAULTS = {
   title: 'Welcome to Count Me In!',
   description:
     'Click the settings icon to update this messaging in line with your event.',
-  panelColor: '#005eb8',
+  panelColor: '#ff6b00',
   circleColor: '#ffffff',
   heroText: '#ffffff',
-  blueText: '#005eb8',
-  greyText: '#55738c',
-  pageBackground: '#edf3f8',
+  blueText: '#101016',
+  greyText: '#68686d',
+  pageBackground: '#f7f7f8',
   badgeBackground: '#ffffff',
-  badgeText: '#003087',
-  progressColor: '#00a499'
+  badgeText: '#101016',
+  progressColor: '#ff6b00'
 };
 
 const FUN_MESSAGES = [
@@ -838,8 +841,6 @@ function applySettings(settings) {
     );
   }
 
-  // Keep secondary text grouped with the main
-  // welcome panel text colour.
   document.documentElement.style.setProperty(
     '--hero-muted',
     settings.heroText
@@ -1168,3 +1169,4 @@ setInterval(
 
 </body>
 </html>
+
