@@ -8,7 +8,7 @@
 
 <style>
 :root {
-  /* Modern orange / black / grey default theme */
+  /* Orange, black and grey default theme */
   --page-bg: #f7f7f8;
   --hero-bg: #ff6b00;
   --circle-color: #ffffff;
@@ -290,7 +290,7 @@ textarea {
   height: 24px;
 }
 
-/* Settings modal */
+/* Settings window */
 
 .settings-backdrop {
   position: fixed;
@@ -497,11 +497,15 @@ textarea {
         WELCOME TO THE EVENT
       </div>
 
-      <h1 id="heroTitle">Welcome to Count Me In!</h1>
+      <h1 id="heroTitle">
+        Thanks for trying out Count Me In!
+      </h1>
 
       <p id="heroDescription">
-        Click the settings icon to update this messaging
-        in line with your event.
+        Make this screen your own! Click the settings icon
+        in the bottom-right corner to personalise your
+        welcome message and choose a colour scheme
+        that suits your event.
       </p>
 
       <div
@@ -750,9 +754,9 @@ const MESSAGE_INTERVAL = 50000;
 const EVENT_CAPACITY = 200;
 
 const DEFAULTS = {
-  title: 'Welcome to Count Me In!',
+  title: 'Thanks for trying out Count Me In!',
   description:
-    'Click the settings icon to update this messaging in line with your event.',
+    'Make this screen your own! Click the settings icon in the bottom-right corner to personalise your welcome message and choose a colour scheme that suits your event.',
   panelColor: '#ff6b00',
   circleColor: '#ffffff',
   heroText: '#ffffff',
@@ -1169,4 +1173,5 @@ setInterval(
 
 </body>
 </html>
+
 
