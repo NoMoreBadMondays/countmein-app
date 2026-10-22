@@ -39,89 +39,34 @@
       flex-direction: column;
     }
 
-    .top {
-      height: 12px;
-      background: var(--nhs);
-    }
-
-    .header {
-      background: white;
-      padding: 22px 5vw;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      border-bottom: 1px solid #d5e1ea;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 18px;
-    }
-
+    /* Floating settings button */
     .settings-button {
-      width: 42px;
-      height: 42px;
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 8;
+      width: 48px;
+      height: 48px;
       display: grid;
       place-items: center;
-      border: 1px solid #cbdce9;
-      border-radius: 12px;
+      border: 1px solid #d1deeb;
+      border-radius: 50%;
       background: #fff;
-      color: var(--deep);
+      color: #003087;
+      box-shadow: 0 6px 24px #00308730;
       cursor: pointer;
-      flex-shrink: 0;
     }
 
     .settings-button:hover,
     .settings-button:focus-visible {
       background: #e8f2fb;
-      outline: 2px solid var(--nhs);
+      outline: 2px solid #005eb8;
       outline-offset: 2px;
     }
 
     .settings-button svg {
-      width: 22px;
-      height: 22px;
-    }
-
-    .nhs {
-      font: bold italic 40px Arial;
-      color: white;
-      background: var(--nhs);
-      padding: 1px 16px 3px;
-      letter-spacing: -3px;
-    }
-
-    .header small {
-      display: block;
-      color: #52718a;
-      font-size: 13px;
-      letter-spacing: 1.4px;
-      font-weight: 700;
-    }
-
-    .header strong {
-      font-size: 20px;
-    }
-
-    .pill {
-      border-radius: 50px;
-      background: #e8f6ef;
-      color: #087347;
-      padding: 10px 16px;
-      font-size: 13px;
-      font-weight: bold;
-      white-space: nowrap;
-    }
-
-    .dot {
-      display: inline-block;
-      background: #16a36a;
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      margin-right: 7px;
+      width: 24px;
+      height: 24px;
     }
 
     .main {
@@ -129,8 +74,8 @@
       display: grid;
       grid-template-columns:
         minmax(0, 1.55fr) minmax(300px, .8fr);
-      gap: 30px;
-      padding: 4vw 5vw;
+      gap: 24px;
+      padding: clamp(16px, 2.2vw, 34px);
       align-items: stretch;
     }
 
@@ -142,8 +87,8 @@
       );
       border-radius: 22px;
       color: white;
-      min-height: 530px;
-      padding: clamp(32px, 5vw, 70px);
+      min-height: min(530px, calc(100vh - 68px));
+      padding: clamp(28px, 4vw, 64px);
       display: flex;
       flex-direction: column;
       position: relative;
@@ -346,8 +291,7 @@
       transform: translate(-50%, 0);
     }
 
-    /* SETTINGS PANEL */
-
+    /* Settings window */
     .settings-backdrop {
       position: fixed;
       inset: 0;
@@ -477,32 +421,11 @@
       }
 
       .hero {
-        min-height: 520px;
-      }
-
-      .header strong {
-        font-size: 16px;
+        min-height: 460px;
       }
     }
 
     @media (max-width: 600px) {
-      .header {
-        padding: 18px;
-      }
-
-      .header small {
-        font-size: 10px;
-      }
-
-      .nhs {
-        font-size: 31px;
-      }
-
-      .pill {
-        font-size: 10px;
-        padding: 8px;
-      }
-
       .arrival {
         flex-direction: column;
         align-items: stretch;
@@ -512,13 +435,15 @@
         align-self: flex-start;
       }
 
-      .brand {
-        gap: 10px;
+      .settings-button {
+        bottom: 14px;
+        right: 14px;
+        width: 44px;
+        height: 44px;
       }
 
-      .settings-button {
-        width: 36px;
-        height: 36px;
+      .main {
+        padding: 14px 14px 72px;
       }
     }
   </style>
@@ -527,49 +452,35 @@
 <body>
   <div class="frame">
 
-    <div class="top"></div>
-
-    <header class="header">
-      <div class="brand">
-
-        <button
-          class="settings-button"
-          id="settingsOpen"
-          type="button"
-          aria-label="Open event settings"
-          title="Event settings"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/>
-            <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.07.07-1.86 1.86-.07-.07a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1 1.56V20h-2.63v-.04a1.7 1.7 0 0 0-1-1.56 1.7 1.7 0 0 0-1.88.34l-.07.07-1.86-1.86.07-.07A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.56-1H5.4v-2.63h.04A1.7 1.7 0 0 0 7 10.37a1.7 1.7 0 0 0-.34-1.88l-.07-.07 1.86-1.86.07.07A1.7 1.7 0 0 0 10.4 7a1.7 1.7 0 0 0 1-1.56V5.4h2.63v.04A1.7 1.7 0 0 0 15 7a1.7 1.7 0 0 0 1.88-.34l.07-.07 1.86 1.86-.07.07A1.7 1.7 0 0 0 18.4 10.4a1.7 1.7 0 0 0 1.56 1h.04v2.63h-.04A1.7 1.7 0 0 0 19.4 15Z" transform="translate(-.7 -.7)"/>
-          </svg>
-        </button>
-
-        <div class="nhs">NHS</div>
-
-        <div>
-          <small>INNOVATION • COLLABORATION • AI</small>
-          <strong>Count Me In!</strong>
-        </div>
-
-      </div>
-
-      <div class="pill">
-        <span class="dot"></span>
-        EVENT CHECK-IN LIVE
-      </div>
-    </header>
+    <!-- Settings cog in bottom-right corner -->
+    <button
+      class="settings-button"
+      id="settingsOpen"
+      type="button"
+      aria-label="Open event settings"
+      title="Event settings"
+    >
+      <!-- Lucide Settings icon, embedded in HTML -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+    </button>
 
     <main class="main">
 
+      <!-- Main welcome panel -->
       <section class="hero" id="hero">
 
         <div class="eyebrow">
@@ -582,8 +493,12 @@
           Click the settings icon to update this messaging in line with your event.
         </p>
 
-        <div class="arrival" id="arrival" aria-live="polite">
-
+        <!-- Live arrivals / rotating fun messages -->
+        <div
+          class="arrival"
+          id="arrival"
+          aria-live="polite"
+        >
           <div>
             <div class="tag" id="arrivalTag">
               ✨ JUST CHECKED IN
@@ -602,10 +517,11 @@
             <small>CHECKED IN</small>
             <strong id="guestNumber">—</strong>
           </div>
-
         </div>
+
       </section>
 
+      <!-- Live counter -->
       <aside class="side">
         <section class="panel">
 
@@ -639,10 +555,10 @@
     </main>
   </div>
 
+  <!-- New check-in notification -->
   <div class="toast" id="toast" role="status"></div>
 
-  <!-- EVENT SETTINGS POPUP -->
-
+  <!-- Settings pop-up -->
   <div
     class="settings-backdrop"
     id="settingsBackdrop"
@@ -656,9 +572,7 @@
     >
 
       <div class="settings-head">
-        <h2 id="settingsHeading">
-          Event settings
-        </h2>
+        <h2 id="settingsHeading">Event settings</h2>
 
         <button
           class="close-button"
@@ -677,7 +591,6 @@
 
         <label class="field">
           <span>Main welcome heading</span>
-
           <textarea
             id="settingTitle"
             rows="3"
@@ -688,7 +601,6 @@
 
         <label class="field">
           <span>Description underneath</span>
-
           <textarea
             id="settingDescription"
             rows="4"
@@ -701,7 +613,6 @@
 
           <label class="field">
             <span>Welcome panel colour</span>
-
             <input
               class="color-input"
               id="settingPanelColor"
@@ -712,7 +623,6 @@
 
           <label class="field">
             <span>Decorative circle colour</span>
-
             <input
               class="color-input"
               id="settingCircleColor"
@@ -743,7 +653,6 @@
         </div>
 
       </form>
-
     </section>
   </div>
 
@@ -752,15 +661,18 @@
 
     const $ = id => document.getElementById(id);
 
-    // LIVE CHECK-IN SETTINGS
-
+    // Existing working API
     const API_URL = '/api/status';
+
+    // Check for new arrivals every five seconds
     const REFRESH_INTERVAL = 5000;
+
+    // Rotate funny messages every 50 seconds
     const MESSAGE_INTERVAL = 50000;
+
     const EVENT_CAPACITY = 200;
 
-    // DEFAULT EVENT APPEARANCE
-
+    // Default event appearance
     const DEFAULTS = {
       title: 'Welcome to Count Me In!',
       description:
@@ -769,8 +681,7 @@
       circleColor: '#ffffff'
     };
 
-    // FOUR ROTATING FUN MESSAGES
-
+    // Four repeating funny messages
     const FUN_MESSAGES = [
       {
         tag: '👀 THE WAITING GAME',
@@ -780,15 +691,13 @@
       {
         tag: '⏰ FASHIONABLY LATE?',
         message: "Who's planning a dramatic entrance?",
-        subtitle:
-          'We promise to give them a round of applause!'
+        subtitle: 'We promise to give them a round of applause!'
       },
       {
         tag: '☕ IMPORTANT QUESTION',
         message:
           'We hope the latecomers are bringing biscuits!',
-        subtitle:
-          'Chocolate digestives get extra points.'
+        subtitle: 'Chocolate digestives get extra points.'
       },
       {
         tag: '🎤 THE GRAND ENTRANCE',
@@ -802,14 +711,14 @@
 
     let lastCount = null;
     let lastGuestId = null;
+
     let lastArrivalTime = Date.now();
     let currentFunMessage = -1;
 
     let requestInProgress = false;
     let toastTimer = null;
 
-    // APPLY EVENT SETTINGS
-
+    // Apply event settings to the welcome screen
     function applySettings(settings) {
       currentSettings = { ...settings };
 
@@ -834,9 +743,9 @@
       );
     }
 
+    // Fill the settings form with current values
     function populateSettingsForm() {
-      $('settingTitle').value =
-        currentSettings.title;
+      $('settingTitle').value = currentSettings.title;
 
       $('settingDescription').value =
         currentSettings.description;
@@ -893,6 +802,7 @@
       }
     );
 
+    // Save changes in the current browser page only
     $('settingsForm').addEventListener(
       'submit',
       event => {
@@ -909,8 +819,8 @@
         }
 
         applySettings({
-          title: title,
-          description: description,
+          title,
+          description,
           panelColor:
             $('settingPanelColor').value,
           circleColor:
@@ -921,6 +831,7 @@
       }
     );
 
+    // Restore original settings
     $('settingsReset').addEventListener(
       'click',
       () => {
@@ -928,8 +839,6 @@
         populateSettingsForm();
       }
     );
-
-    // CHECK-IN HELPERS
 
     function getGuestName(data) {
       const name = data?.latestGuest?.name;
@@ -952,12 +861,11 @@
         100,
         Math.max(
           0,
-          (count / EVENT_CAPACITY) * 100
+          count / EVENT_CAPACITY * 100
         )
       );
 
-      $('fill').style.width =
-        percentage + '%';
+      $('fill').style.width = percentage + '%';
     }
 
     function animateArrival() {
@@ -971,22 +879,19 @@
     }
 
     function showToast(message) {
-      const toast = $('toast');
+      $('toast').textContent = message;
 
-      toast.textContent = message;
-      toast.classList.add('show');
+      $('toast').classList.add('show');
 
       clearTimeout(toastTimer);
 
       toastTimer = setTimeout(
         () => {
-          toast.classList.remove('show');
+          $('toast').classList.remove('show');
         },
         3000
       );
     }
-
-    // DISPLAY A NEW GUEST
 
     function showGuestArrival(name, count) {
       $('arrivalTag').textContent =
@@ -1014,25 +919,19 @@
       }
     }
 
-    // DISPLAY A FUN WAITING MESSAGE
-
     function showFunMessage(index) {
       const item =
         FUN_MESSAGES[index % FUN_MESSAGES.length];
 
-      $('arrivalTag').textContent =
-        item.tag;
+      $('arrivalTag').textContent = item.tag;
 
-      $('welcome').textContent =
-        item.message;
+      $('welcome').textContent = item.message;
 
       $('arrivalSubtitle').textContent =
         item.subtitle;
 
       animateArrival();
     }
-
-    // ROTATE EVERY 50 SECONDS
 
     function updateWaitingMessage() {
       if (lastCount === null) {
@@ -1056,8 +955,7 @@
       }
     }
 
-    // GET THE LATEST CHECK-IN FROM AZURE
-
+    // Live API polling
     async function refreshCheckIns() {
       if (requestInProgress) {
         return;
@@ -1096,32 +994,24 @@
         }
 
         const newCount = data.count;
+
         const guestName = getGuestName(data);
+
         const guestId = getGuestId(data);
 
-        // UPDATE LIVE COUNTERS
-
-        $('count').textContent =
-          String(newCount);
+        $('count').textContent = String(newCount);
 
         $('guestNumber').textContent =
           String(newCount);
 
         updateProgress(newCount);
 
-        // FIRST LOAD
-
         if (lastCount === null) {
           lastArrivalTime = Date.now();
           currentFunMessage = -1;
 
-          showGuestArrival(
-            guestName,
-            newCount
-          );
+          showGuestArrival(guestName, newCount);
         } else {
-          // DETECT A NEW ARRIVAL
-
           const isNewArrival =
             newCount > lastCount ||
             (
@@ -1131,17 +1021,10 @@
             );
 
           if (isNewArrival) {
-            // RESET THE 50-SECOND TIMER
-
             lastArrivalTime = Date.now();
             currentFunMessage = -1;
 
-            // SHOW THE GUEST IMMEDIATELY
-
-            showGuestArrival(
-              guestName,
-              newCount
-            );
+            showGuestArrival(guestName, newCount);
 
             animateArrival();
 
@@ -1150,26 +1033,18 @@
               guestName.toLowerCase() !== 'guest'
             ) {
               showToast(
-                '🎉 ' +
-                guestName +
-                ' has checked in!'
+                '🎉 ' + guestName + ' has checked in!'
               );
             } else {
               showToast(
                 '🎉 A new guest has checked in!'
               );
             }
-
           } else if (newCount < lastCount) {
-            // HANDLE A RESET CHECK-IN LIST
-
             lastArrivalTime = Date.now();
             currentFunMessage = -1;
 
-            showGuestArrival(
-              guestName,
-              newCount
-            );
+            showGuestArrival(guestName, newCount);
           }
         }
 
@@ -1190,6 +1065,7 @@
 
         if (lastCount === null) {
           $('count').textContent = '—';
+
           $('guestNumber').textContent = '—';
 
           $('welcome').textContent =
@@ -1201,21 +1077,18 @@
       }
     }
 
-    // START EVERYTHING
-
+    // Set default appearance
     applySettings(DEFAULTS);
 
+    // Start live check-ins
     refreshCheckIns();
-
-    // CHECK AZURE EVERY FIVE SECONDS
 
     setInterval(
       refreshCheckIns,
       REFRESH_INTERVAL
     );
 
-    // CHECK THE FUN-MESSAGE TIMER EVERY SECOND
-
+    // Start rotating waiting messages
     setInterval(
       updateWaitingMessage,
       1000
@@ -1223,4 +1096,3 @@
   </script>
 </body>
 </html>
-
