@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Validate Office add-in manifest
-        run: npx --yes @microsoft/office-addin-manifest validate manifest.xml
+        run: npx --yes office-addin-manifest validate manifest.xml
