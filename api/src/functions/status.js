@@ -3,16 +3,17 @@ import { app } from "@azure/functions";
 import { TableClient } from "@azure/data-tables";
 
 const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 app.http("status", {
   methods: ["GET"],
   authLevel: "anonymous",
+  route: "status",
 
   handler: async (request, context) => {
     try {
-      const eventId = new URL(request.url)
-        .searchParams.get("event");
+      // Read the event ID using Azure Functions' query API.
+      const eventId = request.query.get("event");
 
       if (!eventId || !UUID_PATTERN.test(eventId)) {
         return {
@@ -27,11 +28,14 @@ app.http("status", {
         };
       }
 
+      // Connect to Azure Table Storage.
       const connectionString =
         process.env.COUNTMEIN_STORAGE_CONNECTION;
 
       if (!connectionString) {
-        throw new Error("Storage connection is missing");
+        throw new Error(
+          "COUNTMEIN_STORAGE_CONNECTION is missing"
+        );
       }
 
       const eventsTable = TableClient.fromConnectionString(
@@ -44,14 +48,21 @@ app.http("status", {
         "CheckIns"
       );
 
+      // Find the event.
       let event;
 
       try {
-        event = await eventsTable.getEntity("event", eventId);
+        event = await eventsTable.getEntity(
+          "event",
+          eventId
+        );
       } catch (error) {
         if (error.statusCode === 404) {
           return {
             status: 404,
+            headers: {
+              "Cache-Control": "no-store"
+            },
             jsonBody: {
               status: "error",
               message: "Event not found"
@@ -62,6 +73,7 @@ app.http("status", {
         throw error;
       }
 
+      // Read all check-ins belonging to this event.
       let count = 0;
       let latest = null;
 
@@ -76,12 +88,14 @@ app.http("status", {
 
         if (
           !latest ||
-          item.checkedInAt > latest.checkedInAt
+          String(item.checkedInAt || "") >
+            String(latest.checkedInAt || "")
         ) {
           latest = item;
         }
       }
 
+      // Return the data expected by Count Me In!
       return {
         status: 200,
         headers: {
@@ -92,7 +106,7 @@ app.http("status", {
           app: "Count Me In!",
           event: event.name,
           status: event.status,
-          count,
+          count: count,
           latestGuest: latest
             ? {
                 id: latest.rowKey,
@@ -105,10 +119,16 @@ app.http("status", {
       };
 
     } catch (error) {
-      context.error("Unable to retrieve event status", error);
+      context.error(
+        "Unable to retrieve event status",
+        error
+      );
 
       return {
         status: 500,
+        headers: {
+          "Cache-Control": "no-store"
+        },
         jsonBody: {
           status: "error",
           message: "Unable to retrieve check-ins"
@@ -117,3 +137,4 @@ app.http("status", {
     }
   }
 });
+
