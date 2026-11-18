@@ -8,7 +8,6 @@
 
 <style>
 :root {
-  /* Orange, black and grey default theme */
   --page-bg: #f7f7f8;
   --hero-bg: #ff6b00;
   --circle-color: #ffffff;
@@ -24,9 +23,7 @@
   --arrival-border: #ffffff3a;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -35,11 +32,8 @@ body {
   color: var(--blue-text);
 }
 
-button,
-input,
-textarea {
-  font: inherit;
-}
+button, input, textarea { font: inherit; }
+[hidden] { display: none !important; }
 
 .frame {
   min-height: 100vh;
@@ -50,8 +44,7 @@ textarea {
 .main {
   flex: 1;
   display: grid;
-  grid-template-columns:
-    minmax(0, 1.55fr) minmax(300px, .8fr);
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, .8fr);
   gap: 24px;
   padding: clamp(16px, 2.2vw, 34px);
   align-items: stretch;
@@ -129,9 +122,7 @@ textarea {
   gap: 18px;
 }
 
-.arrival.pop {
-  animation: pop .55s ease;
-}
+.arrival.pop { animation: pop .55s ease; }
 
 @keyframes pop {
   0% { transform: scale(.96); }
@@ -243,14 +234,14 @@ textarea {
   bottom: 32px;
   left: 50%;
   transform: translate(-50%, 130px);
-  background: var(--blue-text);
+  background: #101016;
   color: white;
   border-radius: 12px;
   padding: 14px 25px;
   box-shadow: 0 15px 40px #10101655;
   font-weight: bold;
   transition: transform .4s;
-  z-index: 5;
+  z-index: 20;
   max-width: 90vw;
   text-align: center;
 }
@@ -258,8 +249,6 @@ textarea {
 .toast.show {
   transform: translate(-50%, 0);
 }
-
-/* Floating settings button */
 
 .settings-button {
   position: fixed;
@@ -273,7 +262,7 @@ textarea {
   border: 1px solid #dedee2;
   border-radius: 50%;
   background: white;
-  color: var(--blue-text);
+  color: #101016;
   box-shadow: 0 6px 24px #10101625;
   cursor: pointer;
 }
@@ -281,7 +270,7 @@ textarea {
 .settings-button:hover,
 .settings-button:focus-visible {
   background: #f3f3f4;
-  outline: 2px solid var(--progress-color);
+  outline: 2px solid #ff6b00;
   outline-offset: 2px;
 }
 
@@ -289,8 +278,6 @@ textarea {
   width: 24px;
   height: 24px;
 }
-
-/* Settings window */
 
 .settings-backdrop {
   position: fixed;
@@ -301,10 +288,6 @@ textarea {
   justify-content: center;
   align-items: center;
   padding: 18px;
-}
-
-.settings-backdrop[hidden] {
-  display: none;
 }
 
 .settings-dialog {
@@ -327,7 +310,6 @@ textarea {
 
 .settings-head h2 {
   margin: 0;
-  color: #101016;
   font-size: 25px;
 }
 
@@ -349,7 +331,6 @@ textarea {
 
 .settings-section-title {
   font-size: 16px;
-  color: #101016;
   margin: 26px 0 10px;
   padding-bottom: 8px;
   border-bottom: 1px solid #e3e3e5;
@@ -367,16 +348,19 @@ textarea {
   margin-bottom: 7px;
 }
 
-.field textarea {
+.field textarea,
+.field input[type="text"] {
   width: 100%;
   border: 1px solid #bdbdc3;
   border-radius: 10px;
   padding: 12px;
-  resize: vertical;
   line-height: 1.4;
 }
 
+.field textarea { resize: vertical; }
+
 .field textarea:focus-visible,
+.field input:focus-visible,
 .color-input:focus-visible {
   outline: 2px solid #ff6b00;
   outline-offset: 2px;
@@ -414,6 +398,11 @@ textarea {
   cursor: pointer;
 }
 
+.action-button:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
 .apply {
   background: #ff6b00;
   color: #101016;
@@ -424,14 +413,66 @@ textarea {
   color: #101016;
 }
 
-@media (max-width: 900px) {
-  .main {
-    grid-template-columns: 1fr;
-  }
+.event-tools {
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 12px;
+  background: #f7f7f8;
+}
 
-  .hero {
-    min-height: 460px;
-  }
+.event-tools h4 {
+  margin: 12px 0 8px;
+}
+
+.event-link {
+  overflow-wrap: anywhere;
+  width: 100%;
+  font-size: 13px;
+  background: white;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  user-select: all;
+}
+
+#eventFeedback {
+  white-space: pre-line;
+}
+
+#qrCode {
+  display: flex;
+  justify-content: center;
+  padding: 12px;
+  background: white;
+  width: fit-content;
+  max-width: 100%;
+  margin: 12px auto;
+}
+
+#qrCode canvas,
+#qrCode img {
+  max-width: 100%;
+  height: auto;
+}
+
+.organiser-login {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 8;
+  border: 1px solid #dedee2;
+  border-radius: 12px;
+  background: white;
+  color: #101016;
+  padding: 12px 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 6px 24px #10101625;
+}
+
+@media (max-width: 900px) {
+  .main { grid-template-columns: 1fr; }
+  .hero { min-height: 460px; }
 }
 
 @media (max-width: 600px) {
@@ -440,9 +481,7 @@ textarea {
     align-items: stretch;
   }
 
-  .guest-badge {
-    align-self: flex-start;
-  }
+  .guest-badge { align-self: flex-start; }
 
   .settings-button {
     bottom: 14px;
@@ -451,13 +490,8 @@ textarea {
     height: 44px;
   }
 
-  .main {
-    padding: 14px 14px 72px;
-  }
-
-  .color-grid {
-    grid-template-columns: 1fr;
-  }
+  .main { padding: 14px 14px 72px; }
+  .color-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -466,13 +500,13 @@ textarea {
 
 <div class="frame">
 
-  <!-- Settings cog -->
   <button
     class="settings-button"
     id="settingsOpen"
     type="button"
     aria-label="Open event settings"
     title="Event settings"
+    hidden
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -487,6 +521,15 @@ textarea {
       <path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/>
       <circle cx="12" cy="12" r="3"/>
     </svg>
+  </button>
+
+  <button
+    id="organiserLogin"
+    class="organiser-login"
+    type="button"
+    hidden
+  >
+    Organiser sign-in
   </button>
 
   <main class="main">
@@ -570,7 +613,6 @@ textarea {
 
 <div class="toast" id="toast" role="status"></div>
 
-<!-- Settings window -->
 <div
   class="settings-backdrop"
   id="settingsBackdrop"
@@ -595,9 +637,105 @@ textarea {
     </div>
 
     <p class="settings-note">
-      Personalise your event screen.
-      Changes last until this page is refreshed or closed.
+      Create an event, share your guest QR code,
+      and personalise your live welcome screen.
     </p>
+
+    <h3 class="settings-section-title">
+      Create your event
+    </h3>
+
+    <div class="event-tools">
+
+      <p class="settings-note" id="signInStatus">
+        Checking organiser sign-in...
+      </p>
+
+      <button
+        class="action-button reset"
+        id="signInButton"
+        type="button"
+        hidden
+      >
+        Sign in with Microsoft
+      </button>
+
+      <label class="field">
+        <span>Event name</span>
+        <input
+          id="eventName"
+          type="text"
+          maxlength="100"
+          placeholder="e.g. Friday Team Celebration"
+        >
+      </label>
+
+      <button
+        class="action-button apply"
+        id="createEventButton"
+        type="button"
+        disabled
+      >
+        Create Event
+      </button>
+
+      <p
+        class="settings-note"
+        id="eventFeedback"
+        role="status"
+      ></p>
+
+      <div id="eventLinks" hidden>
+
+        <h4>PowerPoint display link</h4>
+
+        <div class="event-link" id="displayLink"></div>
+
+        <button
+          class="action-button reset"
+          id="copyDisplay"
+          type="button"
+        >
+          Copy display link
+        </button>
+
+        <h4>Guest check-in link</h4>
+
+        <div class="event-link" id="checkinLink"></div>
+
+        <button
+          class="action-button reset"
+          id="copyCheckin"
+          type="button"
+        >
+          Copy guest link
+        </button>
+
+        <h4>Guest QR code</h4>
+
+        <p class="settings-note">
+          Guests scan this code to enter their first name.
+        </p>
+
+        <div id="qrCode"></div>
+
+        <button
+          class="action-button apply"
+          id="downloadQR"
+          type="button"
+        >
+          Download QR code
+        </button>
+
+        <p class="settings-note">
+          Save your links somewhere safe.
+          This version does not yet include
+          an event history or event selection list.
+        </p>
+
+      </div>
+
+    </div>
 
     <form id="settingsForm">
 
@@ -723,6 +861,7 @@ textarea {
       </div>
 
       <div class="actions">
+
         <button
           class="action-button apply"
           type="submit"
@@ -737,11 +876,16 @@ textarea {
         >
           Reset to defaults
         </button>
+
       </div>
 
     </form>
+
   </section>
 </div>
+
+<!-- QR code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <script>
 'use strict';
@@ -752,6 +896,9 @@ const API_URL = '/api/status';
 const REFRESH_INTERVAL = 5000;
 const MESSAGE_INTERVAL = 50000;
 const EVENT_CAPACITY = 200;
+
+const EVENT_ID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 const DEFAULTS = {
   title: 'Thanks for trying out Count Me In!',
@@ -781,14 +928,12 @@ const FUN_MESSAGES = [
   },
   {
     tag: '☕ IMPORTANT QUESTION',
-    message:
-      'We hope the latecomers are bringing biscuits!',
+    message: 'We hope the latecomers are bringing biscuits!',
     subtitle: 'Chocolate digestives get extra points.'
   },
   {
     tag: '🎤 THE GRAND ENTRANCE',
-    message:
-      'Is anyone rehearsing their entrance music?',
+    message: 'Is anyone rehearsing their entrance music?',
     subtitle: 'The stage is yours!'
   }
 ];
@@ -801,6 +946,13 @@ let lastArrivalTime = Date.now();
 let currentFunMessage = -1;
 let requestInProgress = false;
 let toastTimer = null;
+
+let organiserSignedIn = false;
+let activeEventId =
+  new URLSearchParams(window.location.search).get('event');
+
+let eventUrls = null;
+let eventRequestSequence = 0;
 
 const COLOR_SETTINGS = [
   ['settingPanelColor', 'panelColor', '--hero-bg'],
@@ -834,9 +986,7 @@ function applySettings(settings) {
   currentSettings = { ...settings };
 
   $('heroTitle').textContent = settings.title;
-
-  $('heroDescription').textContent =
-    settings.description;
+  $('heroDescription').textContent = settings.description;
 
   for (const [, key, cssVariable] of COLOR_SETTINGS) {
     document.documentElement.style.setProperty(
@@ -863,16 +1013,16 @@ function populateSettingsForm() {
 }
 
 function openSettings() {
+  if (!organiserSignedIn) return;
+
   populateSettingsForm();
 
   $('settingsBackdrop').hidden = false;
-
-  $('settingTitle').focus();
+  $('eventName').focus();
 }
 
 function closeSettings() {
   $('settingsBackdrop').hidden = true;
-
   $('settingsOpen').focus();
 }
 
@@ -916,22 +1066,17 @@ $('settingsForm').addEventListener(
     const description =
       $('settingDescription').value.trim();
 
-    if (!title || !description) {
-      return;
-    }
+    if (!title || !description) return;
 
-    const settings = {
-      title,
-      description
-    };
+    const settings = { title, description };
 
     for (const [inputId, key] of COLOR_SETTINGS) {
       settings[key] = $(inputId).value;
     }
 
     applySettings(settings);
-
     closeSettings();
+    showToast('Display settings updated!');
   }
 );
 
@@ -972,9 +1117,7 @@ function animateArrival() {
   const arrival = $('arrival');
 
   arrival.classList.remove('pop');
-
   void arrival.offsetWidth;
-
   arrival.classList.add('pop');
 }
 
@@ -1023,15 +1166,11 @@ function showFunMessage(index) {
 }
 
 function updateWaitingMessage() {
-  if (lastCount === null) {
-    return;
-  }
+  if (lastCount === null) return;
 
   const elapsed = Date.now() - lastArrivalTime;
 
-  if (elapsed < MESSAGE_INTERVAL) {
-    return;
-  }
+  if (elapsed < MESSAGE_INTERVAL) return;
 
   const index =
     Math.floor(elapsed / MESSAGE_INTERVAL) - 1;
@@ -1043,15 +1182,29 @@ function updateWaitingMessage() {
 }
 
 async function refreshCheckIns() {
-  if (requestInProgress) {
+  if (requestInProgress) return;
+
+  if (!activeEventId || !EVENT_ID_PATTERN.test(activeEventId)) {
+    $('connectionStatus').textContent =
+      'Create an event in settings to start live check-ins.';
+
+    $('count').textContent = '0';
+    $('guestNumber').textContent = '0';
+    $('welcome').textContent = 'Waiting for an event...';
+    updateProgress(0);
     return;
   }
 
   requestInProgress = true;
 
+  const requestedEventId = activeEventId;
+  const requestedSequence = eventRequestSequence;
+
   try {
     const response = await fetch(
-      API_URL + '?refresh=' + Date.now(),
+      API_URL +
+      '?event=' + encodeURIComponent(requestedEventId) +
+      '&refresh=' + Date.now(),
       {
         method: 'GET',
         cache: 'no-store',
@@ -1070,13 +1223,18 @@ async function refreshCheckIns() {
     const data = await response.json();
 
     if (
-      data.status !== 'ready' ||
+      requestedSequence !== eventRequestSequence ||
+      requestedEventId !== activeEventId
+    ) {
+      return;
+    }
+
+    if (
+      data.status !== 'active' ||
       !Number.isSafeInteger(data.count) ||
       data.count < 0
     ) {
-      throw new Error(
-        'Unexpected API response'
-      );
+      throw new Error('Unexpected API response');
     }
 
     const newCount = data.count;
@@ -1091,7 +1249,6 @@ async function refreshCheckIns() {
     if (lastCount === null) {
       lastArrivalTime = Date.now();
       currentFunMessage = -1;
-
       showGuestArrival(guestName, newCount);
     } else {
       const isNewArrival =
@@ -1124,7 +1281,6 @@ async function refreshCheckIns() {
       } else if (newCount < lastCount) {
         lastArrivalTime = Date.now();
         currentFunMessage = -1;
-
         showGuestArrival(guestName, newCount);
       }
     }
@@ -1136,10 +1292,14 @@ async function refreshCheckIns() {
       'Live • Automatically updates every 5 seconds';
 
   } catch (error) {
-    console.error(
-      'Count Me In! API error:',
-      error
-    );
+    if (
+      requestedSequence !== eventRequestSequence ||
+      requestedEventId !== activeEventId
+    ) {
+      return;
+    }
+
+    console.error('Count Me In! API error:', error);
 
     $('connectionStatus').textContent =
       'Connection interrupted • Retrying...';
@@ -1150,14 +1310,274 @@ async function refreshCheckIns() {
       $('welcome').textContent =
         'Connecting to check-ins...';
     }
-
   } finally {
     requestInProgress = false;
   }
 }
 
-applySettings(DEFAULTS);
+function startMicrosoftSignIn() {
+  const returnUrl =
+    window.location.pathname + window.location.search;
 
+  window.location.href =
+    '/.auth/login/aad?post_login_redirect_uri=' +
+    encodeURIComponent(returnUrl);
+}
+
+$('organiserLogin').addEventListener(
+  'click',
+  startMicrosoftSignIn
+);
+
+$('signInButton').addEventListener(
+  'click',
+  startMicrosoftSignIn
+);
+
+async function checkSignIn() {
+  try {
+    const response = await fetch(
+      '/.auth/me',
+      { cache: 'no-store' }
+    );
+
+    if (!response.ok) {
+      throw new Error('Sign-in check failed');
+    }
+
+    const identity = await response.json();
+    const principal = identity.clientPrincipal;
+
+    organiserSignedIn =
+      Array.isArray(principal?.userRoles) &&
+      principal.userRoles.includes('authenticated');
+
+    $('signInStatus').textContent =
+      organiserSignedIn
+        ? 'Signed in with Microsoft.'
+        : 'Sign in with Microsoft to create an event.';
+
+    $('signInButton').hidden = organiserSignedIn;
+    $('createEventButton').disabled = !organiserSignedIn;
+
+    $('settingsOpen').hidden = !organiserSignedIn;
+    $('organiserLogin').hidden = organiserSignedIn;
+
+  } catch (error) {
+    organiserSignedIn = false;
+
+    $('signInStatus').textContent =
+      'Could not verify sign-in. Please try again.';
+
+    $('signInButton').hidden = false;
+    $('createEventButton').disabled = true;
+
+    $('settingsOpen').hidden = true;
+    $('organiserLogin').hidden = false;
+  }
+}
+
+function selectEvent(eventId) {
+  activeEventId = eventId;
+  eventRequestSequence++;
+
+  lastCount = null;
+  lastGuestId = null;
+  lastArrivalTime = Date.now();
+  currentFunMessage = -1;
+
+  history.replaceState(
+    null,
+    '',
+    '/?event=' + encodeURIComponent(eventId)
+  );
+
+  $('count').textContent = '—';
+  $('guestNumber').textContent = '—';
+
+  $('connectionStatus').textContent =
+    'Connecting to your new event...';
+
+  refreshCheckIns();
+}
+
+function renderEventLinks(urls) {
+  eventUrls = {
+    displayUrl: urls.displayUrl,
+    checkinUrl: urls.checkinUrl
+  };
+
+  $('displayLink').textContent = urls.displayUrl;
+  $('checkinLink').textContent = urls.checkinUrl;
+
+  $('eventLinks').hidden = false;
+
+  const qr = $('qrCode');
+  qr.replaceChildren();
+
+  if (typeof QRCode === 'undefined') {
+    qr.textContent =
+      'QR code could not load. Copy the guest link instead.';
+
+    $('downloadQR').disabled = true;
+    return;
+  }
+
+  new QRCode(qr, {
+    text: urls.checkinUrl,
+    width: 220,
+    height: 220,
+    correctLevel: QRCode.CorrectLevel.M
+  });
+
+  $('downloadQR').disabled = false;
+}
+
+async function copyLink(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('Link copied!');
+  } catch (error) {
+    showToast(
+      'Copy failed. Select the link above to copy it.'
+    );
+  }
+}
+
+$('copyDisplay').addEventListener(
+  'click',
+  () => {
+    if (eventUrls) {
+      copyLink(eventUrls.displayUrl);
+    }
+  }
+);
+
+$('copyCheckin').addEventListener(
+  'click',
+  () => {
+    if (eventUrls) {
+      copyLink(eventUrls.checkinUrl);
+    }
+  }
+);
+
+$('downloadQR').addEventListener(
+  'click',
+  () => {
+    const canvas =
+      $('qrCode').querySelector('canvas');
+
+    const image =
+      $('qrCode').querySelector('img');
+
+    const source = canvas
+      ? canvas.toDataURL('image/png')
+      : image?.src;
+
+    if (!source) {
+      showToast('QR code not ready yet.');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = source;
+    link.download = 'count-me-in-guest-qr.png';
+    link.click();
+  }
+);
+
+$('createEventButton').addEventListener(
+  'click',
+  async () => {
+    const name = $('eventName').value.trim();
+
+    if (!name || name.length > 100) {
+      $('eventFeedback').textContent =
+        'Please enter an event name (up to 100 characters).';
+      return;
+    }
+
+    if (!organiserSignedIn) {
+      $('eventFeedback').textContent =
+        'Please sign in first.';
+      return;
+    }
+
+    $('createEventButton').disabled = true;
+
+    $('eventFeedback').textContent =
+      'Creating your event...';
+
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name })
+      });
+
+      if (
+        response.redirected ||
+        response.status === 401 ||
+        response.status === 403
+      ) {
+        throw new Error(
+          'Your sign-in was not accepted by the event API. Please sign in again.'
+        );
+      }
+
+      if (!response.ok) {
+        let details = {};
+
+        try {
+          details = await response.json();
+        } catch (error) {
+          // The server did not return JSON.
+        }
+
+        throw new Error(
+          details.error ||
+          'Server returned HTTP ' + response.status
+        );
+      }
+
+      const result = await response.json();
+
+      if (
+        !EVENT_ID_PATTERN.test(result.eventId || '') ||
+        !result.displayUrl ||
+        !result.checkinUrl
+      ) {
+        throw new Error(
+          'The event API returned an unexpected response.'
+        );
+      }
+
+      // Do not save the organiser token in the browser.
+      renderEventLinks(result);
+      selectEvent(result.eventId);
+
+      $('eventFeedback').textContent =
+        'Event created! Your guest QR code and both links are below.';
+
+      showToast('Event created!');
+
+    } catch (error) {
+      $('eventFeedback').textContent =
+        'Could not create event: ' + error.message;
+
+    } finally {
+      $('createEventButton').disabled =
+        !organiserSignedIn;
+    }
+  }
+);
+
+// Start the application.
+applySettings(DEFAULTS);
+checkSignIn();
 refreshCheckIns();
 
 setInterval(
@@ -1169,9 +1589,8 @@ setInterval(
   updateWaitingMessage,
   1000
 );
+
 </script>
 
 </body>
 </html>
-
-
