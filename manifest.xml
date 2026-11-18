@@ -6,19 +6,14 @@
   xsi:type="ContentApp">
 
   <Id>8e4b2d5a-9f67-4a21-9c3e-5d8f0b7a6c12</Id>
-
   <Version>1.0.0.0</Version>
-
   <ProviderName>Count Me In!</ProviderName>
-
   <DefaultLocale>en-GB</DefaultLocale>
 
   <DisplayName DefaultValue="Count Me In!" />
-
   <Description DefaultValue="Live event welcome screens and guest check-ins for PowerPoint." />
 
   <IconUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/favicon.ico" />
-
   <SupportUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/" />
 
   <AppDomains>
@@ -29,6 +24,12 @@
     <Host Name="Presentation" />
   </Hosts>
 
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="PowerPointApi" MinVersion="1.1" />
+    </Sets>
+  </Requirements>
+
   <DefaultSettings>
     <SourceLocation DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/" />
     <RequestedWidth>960</RequestedWidth>
@@ -36,7 +37,6 @@
   </DefaultSettings>
 
   <Permissions>Restricted</Permissions>
-
   <AllowSnapshot>false</AllowSnapshot>
 
 </OfficeApp>
