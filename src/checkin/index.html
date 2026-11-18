@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
+  <title>Count Me In! | Guest Check-In</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #101016;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      background: #1c1c25;
+      padding: 36px 24px;
+      border-radius: 20px;
+    }
+
+    .brand {
+      color: #ff6b00;
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-size: 28px;
+      line-height: 1.2;
+    }
+
+    p {
+      color: #c9c9d2;
+      line-height: 1.5;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      margin: 18px 0;
+      border: 0;
+      border-radius: 10px;
+      font-size: 18px;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      border: 0;
+      border-radius: 10px;
+      background: #ff6b00;
+      color: #fff;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    #message {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <div class="brand">COUNT ME IN!</div>
+
+    <h1>Welcome!</h1>
+    <p>Enter your first name to check in.</p>
+
+    <form id="checkinForm">
+      <input
+        id="firstName"
+        type="text"
+        placeholder="Your first name"
+        maxlength="60"
+        autocomplete="given-name"
+        required
+      >
+
+      <button id="submitButton" type="submit">
+        Count Me In!
+      </button>
+    </form>
+
+    <p id="message" role="status"></p>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    const eventId = params.get("event");
+
+    const form = document.getElementById("checkinForm");
+    const button = document.getElementById("submitButton");
+    const message = document.getElementById("message");
+
+    if (!eventId) {
+      form.hidden = true;
+      message.textContent = "No event was specified.";
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const firstName = document
+        .getElementById("firstName")
+        .value.trim();
+
+      if (!firstName || !eventId) return;
+
+      button.disabled = true;
+      message.textContent = "Checking you in...";
+
+      try {
+        const response = await fetch("/api/checkin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            eventId,
+            firstName
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error("Check-in failed");
+        }
+
+        form.hidden = true;
+        message.textContent =
+          `You're checked in, ${firstName}! Welcome!`;
+
+      } catch (error) {
+        message.textContent =
+          "Sorry, we couldn't check you in. Please try again.";
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
