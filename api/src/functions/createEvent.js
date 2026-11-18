@@ -3,14 +3,13 @@ import { app } from "@azure/functions";
 import { TableClient } from "@azure/data-tables";
 import { randomBytes, randomUUID, createHash } from "node:crypto";
 
-const storage = process.env.COUNTMEIN_STORAGE_CONNECTION;
-
-function makeEventId() {
-  return randomUUID();
-}
+const WEBSITE_URL =
+  "https://ambitious-bay-07ef57e10.1.azurestaticapps.net";
 
 function hashToken(token) {
-  return createHash("sha256").update(token).digest("hex");
+  return createHash("sha256")
+    .update(token)
+    .digest("hex");
 }
 
 app.http("createEvent", {
@@ -20,32 +19,70 @@ app.http("createEvent", {
 
   handler: async (request, context) => {
     try {
-      // Only authenticated organisers may create events.
-      // Azure Static Web Apps provides identity information.
-      const encoded = request.headers.get("x-ms-client-principal");
+      // Confirm the organiser is signed in.
+      const encoded = request.headers.get(
+        "x-ms-client-principal"
+      );
 
       if (!encoded) {
         return {
           status: 401,
-          jsonBody: { error: "Sign-in required" }
+          jsonBody: {
+            error: "Organiser sign-in required"
+          }
         };
       }
 
-      const principal = JSON.parse(
-        Buffer.from(encoded, "base64").toString("utf8")
-      );
+      let principal;
 
-      if (!principal.userId || !principal.identityProvider) {
+      try {
+        principal = JSON.parse(
+          Buffer.from(encoded, "base64").toString("utf8")
+        );
+      } catch {
         return {
           status: 401,
-          jsonBody: { error: "Invalid identity" }
+          jsonBody: {
+            error: "Invalid organiser identity"
+          }
         };
       }
 
-      const body = await request.json();
-      const eventName = String(body?.name ?? "").trim();
+      if (
+        !principal.userId ||
+        !principal.identityProvider ||
+        !principal.userRoles?.includes("authenticated")
+      ) {
+        return {
+          status: 401,
+          jsonBody: {
+            error: "Authentication required"
+          }
+        };
+      }
 
-      if (!eventName || eventName.length > 100) {
+      // Read and validate the event name.
+      let body;
+
+      try {
+        body = await request.json();
+      } catch {
+        return {
+          status: 400,
+          jsonBody: {
+            error: "A valid JSON request is required"
+          }
+        };
+      }
+
+      const eventName = String(
+        body?.name ?? ""
+      ).trim();
+
+      if (
+        !eventName ||
+        eventName.length > 100
+      ) {
         return {
           status: 400,
           jsonBody: {
@@ -54,50 +91,73 @@ app.http("createEvent", {
         };
       }
 
-      if (!storage) {
-        throw new Error("Storage connection is not configured");
+      // Connect to Azure Table Storage.
+      const connectionString =
+        process.env.COUNTMEIN_STORAGE_CONNECTION;
+
+      if (!connectionString) {
+        throw new Error(
+          "Missing Azure Storage connection setting"
+        );
       }
 
-      const eventId = makeEventId();
-      const organiserToken = randomBytes(32).toString("hex");
-
-      const client = TableClient.fromConnectionString(
-        storage,
+      const eventsTable = TableClient.fromConnectionString(
+        connectionString,
         "Events"
       );
 
-      await client.createEntity({
+      // Create a unique event and private organiser token.
+      const eventId = randomUUID();
+
+      const organiserToken = randomBytes(32)
+        .toString("hex");
+
+      const ownerId =
+        `${principal.identityProvider}:${principal.userId}`;
+
+      await eventsTable.createEntity({
         partitionKey: "event",
         rowKey: eventId,
         name: eventName,
-        ownerId: `${principal.identityProvider}:${principal.userId}`,
+        ownerId,
         organiserTokenHash: hashToken(organiserToken),
         createdAt: new Date().toISOString(),
         status: "active"
       });
 
-      const baseUrl = new URL(request.url).origin;
+      // Generate both public-facing event URLs.
+      const displayUrl =
+        `${WEBSITE_URL}/?event=${encodeURIComponent(eventId)}`;
+
+      const checkinUrl =
+        `${WEBSITE_URL}/checkin?event=${encodeURIComponent(eventId)}`;
 
       return {
         status: 201,
         headers: {
-          "Cache-Control": "no-store"
+          "Cache-Control": "no-store",
+          "Content-Type": "application/json"
         },
         jsonBody: {
+          app: "Count Me In!",
           eventId,
           name: eventName,
-          displayUrl: `${baseUrl}/?event=${eventId}`,
-          checkinUrl: `${baseUrl}/checkin?event=${eventId}`,
+          displayUrl,
+          checkinUrl,
           organiserToken
         }
       };
+
     } catch (error) {
       context.error("Event creation failed", error);
 
       return {
         status: 500,
-        jsonBody: { error: "Unable to create event" }
+        jsonBody: {
+          error: "Unable to create event"
+        }
       };
     }
   }
 });
+
