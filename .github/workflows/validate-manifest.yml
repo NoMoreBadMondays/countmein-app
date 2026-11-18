@@ -12,6 +12,13 @@ jobs:
       - name: Download repository
         uses: actions/checkout@v4
 
+      - name: Check XML syntax
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxml2-utils
+          xmllint --noout manifest.xml
+          echo "XML syntax is valid"
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
