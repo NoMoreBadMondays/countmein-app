@@ -16,7 +16,9 @@
 
   <Description DefaultValue="Live event welcome screens and guest check-ins for PowerPoint." />
 
-  <IconUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/Countmein-icon.png" />
+  <IconUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/countmein-icon.png" />
+
+  <HighResolutionIconUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/countmein-icon.png" />
 
   <SupportUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/" />
 
