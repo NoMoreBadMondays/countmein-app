@@ -1,0 +1,40 @@
+
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:type="ContentApp">
+
+  <Id>8e4b2d5a-9f67-4a21-9c3e-5d8f0b7a6c12</Id>
+
+  <Version>1.0.0.0</Version>
+
+  <ProviderName>Count Me In!</ProviderName>
+
+  <DefaultLocale>en-GB</DefaultLocale>
+
+  <DisplayName DefaultValue="Count Me In!"/>
+
+  <Description DefaultValue="Create live event welcome screens with real-time guest check-ins and QR codes for PowerPoint presentations."/>
+
+  <IconUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/favicon.ico"/>
+
+  <SupportUrl DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/"/>
+
+  <AppDomains>
+    <AppDomain>https://ambitious-bay-07ef57e10.1.azurestaticapps.net</AppDomain>
+  </AppDomains>
+
+  <Hosts>
+    <Host Name="Presentation"/>
+  </Hosts>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://ambitious-bay-07ef57e10.1.azurestaticapps.net/"/>
+    <RequestedWidth>960</RequestedWidth>
+    <RequestedHeight>540</RequestedHeight>
+  </DefaultSettings>
+
+  <Permissions>Restricted</Permissions>
+
+</OfficeApp>
