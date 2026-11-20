@@ -4,17 +4,11 @@
     {
       "route": "/api/events",
       "methods": ["POST"],
-      "allowedRoles": ["authenticated"]
+      "allowedRoles": ["anonymous"]
     },
     {
       "route": "/checkin",
       "allowedRoles": ["anonymous"]
     }
-  ],
-  "responseOverrides": {
-    "401": {
-      "redirect": "/.auth/login/aad",
-      "statusCode": 302
-    }
-  }
+  ]
 }
