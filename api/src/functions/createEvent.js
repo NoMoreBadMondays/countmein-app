@@ -12,6 +12,17 @@ function hashToken(token) {
     .digest("hex");
 }
 
+function jsonResponse(status, body) {
+  return {
+    status,
+    headers: {
+      "Cache-Control": "no-store",
+      "Content-Type": "application/json"
+    },
+    jsonBody: body
+  };
+}
+
 app.http("createEvent", {
   methods: ["POST"],
   authLevel: "anonymous",
@@ -19,62 +30,20 @@ app.http("createEvent", {
 
   handler: async (request, context) => {
     try {
-      // Confirm the organiser is signed in.
-      const encoded = request.headers.get(
-        "x-ms-client-principal"
-      );
+      // No Microsoft sign-in required.
 
-      if (!encoded) {
-        return {
-          status: 401,
-          jsonBody: {
-            error: "Organiser sign-in required"
-          }
-        };
-      }
-
-      let principal;
-
-      try {
-        principal = JSON.parse(
-          Buffer.from(encoded, "base64").toString("utf8")
-        );
-      } catch {
-        return {
-          status: 401,
-          jsonBody: {
-            error: "Invalid organiser identity"
-          }
-        };
-      }
-
-      if (
-        !principal.userId ||
-        !principal.identityProvider ||
-        !principal.userRoles?.includes("authenticated")
-      ) {
-        return {
-          status: 401,
-          jsonBody: {
-            error: "Authentication required"
-          }
-        };
-      }
-
-      // Read and validate the event name.
+      // Read the event details.
       let body;
 
       try {
         body = await request.json();
       } catch {
-        return {
-          status: 400,
-          jsonBody: {
-            error: "A valid JSON request is required"
-          }
-        };
+        return jsonResponse(400, {
+          error: "A valid JSON request is required"
+        });
       }
 
+      // Validate the event name.
       const eventName = String(
         body?.name ?? ""
       ).trim();
@@ -83,12 +52,9 @@ app.http("createEvent", {
         !eventName ||
         eventName.length > 100
       ) {
-        return {
-          status: 400,
-          jsonBody: {
-            error: "Event name must be between 1 and 100 characters"
-          }
-        };
+        return jsonResponse(400, {
+          error: "Event name must be between 1 and 100 characters"
+        });
       }
 
       // Connect to Azure Table Storage.
@@ -106,57 +72,46 @@ app.http("createEvent", {
         "Events"
       );
 
-      // Create a unique event and private organiser token.
+      // Create a unique event.
       const eventId = randomUUID();
 
+      // Generate a private organiser token.
+      // Keep this for future event management features.
       const organiserToken = randomBytes(32)
         .toString("hex");
-
-      const ownerId =
-        `${principal.identityProvider}:${principal.userId}`;
 
       await eventsTable.createEntity({
         partitionKey: "event",
         rowKey: eventId,
         name: eventName,
-        ownerId,
+        ownerId: "anonymous",
         organiserTokenHash: hashToken(organiserToken),
         createdAt: new Date().toISOString(),
         status: "active"
       });
 
-      // Generate both public-facing event URLs.
+      // Generate the event URLs.
       const displayUrl =
         `${WEBSITE_URL}/?event=${encodeURIComponent(eventId)}`;
 
       const checkinUrl =
         `${WEBSITE_URL}/checkin?event=${encodeURIComponent(eventId)}`;
 
-      return {
-        status: 201,
-        headers: {
-          "Cache-Control": "no-store",
-          "Content-Type": "application/json"
-        },
-        jsonBody: {
-          app: "Count Me In!",
-          eventId,
-          name: eventName,
-          displayUrl,
-          checkinUrl,
-          organiserToken
-        }
-      };
+      return jsonResponse(201, {
+        app: "Count Me In!",
+        eventId,
+        name: eventName,
+        displayUrl,
+        checkinUrl,
+        organiserToken
+      });
 
     } catch (error) {
       context.error("Event creation failed", error);
 
-      return {
-        status: 500,
-        jsonBody: {
-          error: "Unable to create event"
-        }
-      };
+      return jsonResponse(500, {
+        error: "Unable to create event"
+      });
     }
   }
 });
